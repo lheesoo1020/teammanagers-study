@@ -19,10 +19,9 @@ public class TermCommandServiceImpl implements TermCommandService {
     private final MemberRepository memberRepository;
 
     @Override
-    public void createTerms(CreateTerms request) {
-        CheckedTerms newCheckedTerms = CreateTerms.from(request);
+    public void createTerms(Long memberId, CreateTerms request) {
 
-        Long memberId = 1L;     //Todo: 이후 수정
+        CheckedTerms newCheckedTerms = CreateTerms.from(request);
         newCheckedTerms.setMember(memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND)));
 
