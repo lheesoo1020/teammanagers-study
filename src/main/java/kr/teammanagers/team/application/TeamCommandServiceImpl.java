@@ -8,7 +8,7 @@ import kr.teammanagers.member.domain.Comment;
 import kr.teammanagers.member.domain.Member;
 import kr.teammanagers.member.repository.CommentRepository;
 import kr.teammanagers.member.repository.MemberRepository;
-import kr.teammanagers.tag.application.TagModuleService;
+import kr.teammanagers.tag.application.module.TagCommandModuleService;
 import kr.teammanagers.tag.domain.Tag;
 import kr.teammanagers.tag.domain.TagTeam;
 import kr.teammanagers.tag.domain.TeamRole;
@@ -47,7 +47,7 @@ public class TeamCommandServiceImpl implements TeamCommandService {
     private final TeamRoleRepository teamRoleRepository;
     private final CommentRepository commentRepository;
 
-    private final TagModuleService tagModuleService;
+    private final TagCommandModuleService tagCommandModuleService;
     private final AmazonS3Provider amazonS3Provider;
     private final AmazonConfig amazonConfig;
 
@@ -61,7 +61,7 @@ public class TeamCommandServiceImpl implements TeamCommandService {
         team.updateTeamCode(encodeNumberToChars(team.getId()));
 
         request.teamTagList().stream()
-                .map(tagModuleService::findOrCreateTag)
+                .map(tagCommandModuleService::findOrCreateTag)
                 .forEach(tag -> tagTeamRepository.save(
                         TagTeam.builder()
                                 .tag(tag)

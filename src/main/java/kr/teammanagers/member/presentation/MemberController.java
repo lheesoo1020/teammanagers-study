@@ -2,7 +2,8 @@ package kr.teammanagers.member.presentation;
 
 import kr.teammanagers.auth.dto.PrincipalDetails;
 import kr.teammanagers.common.payload.code.ApiPayload;
-import kr.teammanagers.member.application.MemberService;
+import kr.teammanagers.member.application.MemberCommandService;
+import kr.teammanagers.member.application.MemberQueryService;
 import kr.teammanagers.member.dto.request.UpdateProfile;
 import kr.teammanagers.member.dto.response.GetMemberTeam;
 import kr.teammanagers.member.dto.response.GetPortfolio;
@@ -21,13 +22,14 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class MemberController {
 
-    private final MemberService memberService;
+    private final MemberQueryService memberQueryService;
+    private final MemberCommandService memberCommandService;
 
     @GetMapping("/member")
     public ApiPayload<GetProfile> getProfile(
             @AuthenticationPrincipal final PrincipalDetails auth
     ) {
-        GetProfile result = memberService.getProfile(auth.member().getId());
+        GetProfile result = memberQueryService.getProfile(auth.member().getId());
         return ApiPayload.onSuccess(result);
     }
 
@@ -37,7 +39,7 @@ public class MemberController {
             @RequestPart(name = "updateProfile") final UpdateProfile updateProfile,
             @RequestPart(name = "imageFile", required = false) final MultipartFile imageFile
     ) {
-        memberService.updateProfile(auth.member().getId(), updateProfile, imageFile);
+        memberCommandService.updateProfile(auth.member().getId(), updateProfile, imageFile);
         return ApiPayload.onSuccess();
     }
 
@@ -46,7 +48,7 @@ public class MemberController {
             @AuthenticationPrincipal final PrincipalDetails auth,
             @PathVariable(name = "commentId") final Long commentId
     ) {
-        memberService.updateCommentState(commentId);
+        memberCommandService.updateCommentState(commentId);
         return ApiPayload.onSuccess();
     }
 
@@ -54,7 +56,7 @@ public class MemberController {
     public ApiPayload<GetSimplePortfolioList> getSimplePortfolioList(
             @AuthenticationPrincipal final PrincipalDetails auth
     ) {
-        GetSimplePortfolioList result = memberService.getSimplePortfolioList(auth.member().getId());
+        GetSimplePortfolioList result = memberQueryService.getSimplePortfolioList(auth.member().getId());
         return ApiPayload.onSuccess(result);
     }
 
@@ -63,7 +65,7 @@ public class MemberController {
             @AuthenticationPrincipal final PrincipalDetails auth,
             @PathVariable(name = "teamId") final Long teamId
     ) {
-        GetPortfolio result = memberService.getPortfolio(auth.member().getId(), teamId);
+        GetPortfolio result = memberQueryService.getPortfolio(auth.member().getId(), teamId);
         return ApiPayload.onSuccess(result);
     }
 
@@ -71,7 +73,7 @@ public class MemberController {
     public ApiPayload<GetMemberTeam> getTeam(
             @AuthenticationPrincipal final PrincipalDetails auth
     ) {
-        GetMemberTeam result = memberService.getMemberTeam(auth.member().getId());
+        GetMemberTeam result = memberQueryService.getMemberTeam(auth.member().getId());
         return ApiPayload.onSuccess(result);
     }
 }

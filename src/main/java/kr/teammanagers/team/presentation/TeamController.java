@@ -1,6 +1,7 @@
 package kr.teammanagers.team.presentation;
 
 import jakarta.validation.Valid;
+import kr.teammanagers.auth.dto.PrincipalDetails;
 import kr.teammanagers.common.payload.code.ApiPayload;
 import kr.teammanagers.team.application.TeamCommandService;
 import kr.teammanagers.team.application.TeamQueryService;
@@ -12,6 +13,7 @@ import kr.teammanagers.team.dto.response.GetTeam;
 import kr.teammanagers.team.dto.response.GetTeamMember;
 import kr.teammanagers.team.dto.response.UpdateTeamEndResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,17 +27,17 @@ public class TeamController {
 
     @PostMapping("/team")
     public ApiPayload<CreateTeamResult> create(
-//            @AuthenticationPrincipal final AuthDto auth,          // TODO : 인증 객체 구현 필요
+            @AuthenticationPrincipal final PrincipalDetails auth,
             @RequestPart(name = "createTeam") @Valid final CreateTeam createTeam,
             @RequestPart(name = "imageFile", required = false) final MultipartFile imageFile
     ) {
-        CreateTeamResult result = teamCommandService.createTeam(1L, createTeam, imageFile);       // TODO : 인증 객체 구현시 auth.id로 변경 필요
+        CreateTeamResult result = teamCommandService.createTeam(auth.member().getId(), createTeam, imageFile);
         return ApiPayload.onSuccess(result);
     }
 
     @PatchMapping("/team/{teamId}/password")
     public ApiPayload<Void> createPassword(
-//            @AuthenticationPrincipal final AuthDto auth,          // TODO : 인증 객체 구현 필요
+            @AuthenticationPrincipal final PrincipalDetails auth,
             @PathVariable("teamId") final Long teamId,
             @RequestBody @Valid final CreateTeamPassword createTeamPassword
     ) {
@@ -45,7 +47,7 @@ public class TeamController {
 
     @GetMapping("/team/{teamId}")
     public ApiPayload<GetTeam> getById(
-//            @AuthenticationPrincipal final AuthDto auth,          // TODO : 인증 객체 구현 필요
+            @AuthenticationPrincipal final PrincipalDetails auth,
             @PathVariable("teamId") final Long teamId
     ) {
         GetTeam result = teamQueryService.getTeamById(teamId);
@@ -54,7 +56,7 @@ public class TeamController {
 
     @GetMapping("/team")
     public ApiPayload<GetTeam> getByTeamCode(
-//            @AuthenticationPrincipal final AuthDto auth,          // TODO : 인증 객체 구현 필요
+            @AuthenticationPrincipal final PrincipalDetails auth,
             @RequestParam("teamCode") final String teamCode
     ) {
         GetTeam result = teamQueryService.getTeamByTeamCode(teamCode);
@@ -63,7 +65,7 @@ public class TeamController {
 
     @GetMapping("/team/{teamId}/member")
     public ApiPayload<GetTeamMember> getTeamMember(
-//            @AuthenticationPrincipal final AuthDto auth,          // TODO : 인증 객체 구현 필요
+            @AuthenticationPrincipal final PrincipalDetails auth,
             @PathVariable("teamId") final Long teamId
     ) {
         GetTeamMember result = teamQueryService.getTeamMember(teamId);
@@ -72,16 +74,16 @@ public class TeamController {
 
     @PatchMapping("/team/{teamId}/state")
     public ApiPayload<UpdateTeamEndResult> updateTeamState(
-//            @AuthenticationPrincipal final AuthDto auth,          // TODO : 인증 객체 구현 필요
+            @AuthenticationPrincipal final PrincipalDetails auth,
             @PathVariable("teamId") final Long teamId
     ) {
-        UpdateTeamEndResult result = teamCommandService.updateTeamState(1L, teamId);
+        UpdateTeamEndResult result = teamCommandService.updateTeamState(auth.member().getId(), teamId);
         return ApiPayload.onSuccess(result);
     }
 
     @PostMapping("/team/comment")
     public ApiPayload<Void> createComment(
-//            @AuthenticationPrincipal final AuthDto auth         // TODO : 인증 객체 구현 필요
+            @AuthenticationPrincipal final PrincipalDetails auth,
             @RequestBody @Valid final CreateTeamComment createTeamComment
     ) {
         teamCommandService.createComment(createTeamComment);
