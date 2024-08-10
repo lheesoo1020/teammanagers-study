@@ -51,6 +51,8 @@ public class TeamData extends AuditingField {
     @JoinColumn(name = "team_manage_id")
     private TeamManage teamManage;
 
+
+
     @Builder
     private TeamData(final String title, final String size, final String fileUrl) {
         this.title = title;
