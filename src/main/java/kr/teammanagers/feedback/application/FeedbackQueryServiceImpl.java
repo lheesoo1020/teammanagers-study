@@ -1,7 +1,7 @@
 package kr.teammanagers.feedback.application;
 
 import kr.teammanagers.feedback.domain.Feedback;
-import kr.teammanagers.feedback.dto.response.FeedbackResponse;
+import kr.teammanagers.feedback.dto.FeedbackDto;
 import kr.teammanagers.feedback.repository.FeedbackRepository;
 import kr.teammanagers.member.domain.Member;
 import kr.teammanagers.storage.domain.TeamData;
@@ -21,12 +21,14 @@ public class FeedbackQueryServiceImpl implements FeedbackQueryService {
     private final TeamDataRepository teamDataRepository;
 
     @Override
-    public List<FeedbackResponse> getFeedbacksByTeamData(Long storageId, Member member) {
-
+    public List<FeedbackDto> getFeedbacksByTeamData(Long storageId, Member member) {
         TeamData teamData = teamDataRepository.findById(storageId)
                 .orElseThrow(() -> new IllegalArgumentException("Team Data not found"));
 
+
         List<Feedback> feedbackList = feedbackRepository.findAllByTeamDataId(storageId);
-        return FeedbackResponse.fromList(feedbackList);
+        return FeedbackDto.fromList(feedbackList);
     }
+
+
 }

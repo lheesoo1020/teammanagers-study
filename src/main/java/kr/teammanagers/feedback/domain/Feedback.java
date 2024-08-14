@@ -10,6 +10,7 @@ import lombok.*;
 @Table(name = "feedback")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@Setter
 public class Feedback extends AuditingField {
 
     @Id
