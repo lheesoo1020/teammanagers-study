@@ -5,6 +5,7 @@ import kr.teammanagers.auth.handler.OAuth2SuccessHandler;
 import kr.teammanagers.auth.Application.CustomOAuth2UserService;
 import kr.teammanagers.global.exception.TokenAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,6 +16,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 @RequiredArgsConstructor
@@ -27,17 +34,20 @@ public class SecurityConfig {
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
-    /*@Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring()
-                .requestMatchers("/error", "/favicon.ico");
-    }*/
+    @Value("${url.be}")
+    private String backEndUrl;
+
+    @Value("${url.fe}")
+    private String frontEndUrl;
+
+    @Value("${jwt.access.header}")
+    private String accessHeader;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
+                .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(apiConfigurationSource()))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .headers(c -> c.frameOptions(
@@ -68,12 +78,21 @@ public class SecurityConfig {
                 .addFilterBefore(tokenAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class);
 
-                /*.addFilterBefore(new TokenExceptionFilter(), tokenAuthenticationFilter.getClass())
-
-                .exceptionHandling((exceptions) -> exceptions
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                        .accessDeniedHandler(new CustomAccessDeniedHandler()));*/
-
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource apiConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:8080", frontEndUrl, backEndUrl));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of(accessHeader));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
