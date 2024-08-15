@@ -99,7 +99,7 @@ spring:
       on-profile: local
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
 
   data:
     redis:
@@ -114,7 +114,7 @@ spring:
       on-profile: dev
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
   data:
     redis:

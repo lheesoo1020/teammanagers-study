@@ -38,8 +38,9 @@ public class TodoQueryServiceImpl implements TodoQueryService {
         List<TodoDto> flatTeamTodoDtoList = teamTodoListDtoList.stream()
                 .flatMap(todoListDto -> todoListDto.todoList().stream()).toList();
 
+        // TODO: 투두 진행도 오류 있음
         Integer progress = flatTeamTodoDtoList.stream().filter(todoDto -> todoDto.status() == Status.COMPLETED).toList().size() * 100
-                / flatTeamTodoDtoList.size();
+                / (flatTeamTodoDtoList.isEmpty() ? 1 : flatTeamTodoDtoList.size());
 
         return GetTodoList.of(teamTodoListDtoList, progress);
     }
