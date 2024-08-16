@@ -1,12 +1,11 @@
 package kr.teammanagers.member.application;
 
-import kr.teammanagers.member.dto.response.GetMemberTeam;
-import kr.teammanagers.member.dto.response.GetPortfolio;
-import kr.teammanagers.member.dto.response.GetProfile;
-import kr.teammanagers.member.dto.response.GetSimplePortfolioList;
+import kr.teammanagers.member.dto.response.*;
 
 public interface MemberQueryService {
     GetProfile getProfile(Long authId);
+
+    GetMyTodoList getMyTodoList(Long authId);
 
     GetSimplePortfolioList getSimplePortfolioList(Long authId);
 

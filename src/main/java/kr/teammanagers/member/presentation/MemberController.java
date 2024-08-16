@@ -5,10 +5,7 @@ import kr.teammanagers.common.payload.code.ApiPayload;
 import kr.teammanagers.member.application.MemberCommandService;
 import kr.teammanagers.member.application.MemberQueryService;
 import kr.teammanagers.member.dto.request.UpdateProfile;
-import kr.teammanagers.member.dto.response.GetMemberTeam;
-import kr.teammanagers.member.dto.response.GetPortfolio;
-import kr.teammanagers.member.dto.response.GetProfile;
-import kr.teammanagers.member.dto.response.GetSimplePortfolioList;
+import kr.teammanagers.member.dto.response.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -30,6 +27,14 @@ public class MemberController {
             @AuthenticationPrincipal final PrincipalDetails auth
     ) {
         GetProfile result = memberQueryService.getProfile(auth.member().getId());
+        return ApiPayload.onSuccess(result);
+    }
+
+    @GetMapping("/member/todo")
+    public ApiPayload<GetMyTodoList> getMyTodoList(
+            @AuthenticationPrincipal final PrincipalDetails auth
+    ) {
+        GetMyTodoList result = memberQueryService.getMyTodoList(auth.member().getId());
         return ApiPayload.onSuccess(result);
     }
 
