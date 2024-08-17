@@ -17,43 +17,43 @@ public class Schedule extends AuditingField {
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "monday_value"))
+            @AttributeOverride(name = "value", column = @Column(name = "monday_value", length = 1000))
     })
     private TimeTable monday;
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "tuesday_value"))
+            @AttributeOverride(name = "value", column = @Column(name = "tuesday_value", length = 1000))
     })
     private TimeTable tuesday;
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "wednesday_value"))
+            @AttributeOverride(name = "value", column = @Column(name = "wednesday_value", length = 1000))
     })
     private TimeTable wednesday;
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "thursday_value"))
+            @AttributeOverride(name = "value", column = @Column(name = "thursday_value", length = 1000))
     })
     private TimeTable thursday;
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "friday_value"))
+            @AttributeOverride(name = "value", column = @Column(name = "friday_value", length = 1000))
     })
     private TimeTable friday;
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "saturday_value"))
+            @AttributeOverride(name = "value", column = @Column(name = "saturday_value", length = 1000))
     })
     private TimeTable saturday;
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "sunday_value"))
+            @AttributeOverride(name = "value", column = @Column(name = "sunday_value", length = 1000))
     })
     private TimeTable sunday;
 
