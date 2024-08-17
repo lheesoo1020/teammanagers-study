@@ -32,7 +32,7 @@ public class TodoRestController {
     public ApiPayload<GetTodoList> get(@AuthenticationPrincipal final PrincipalDetails auth,
                                        @PathVariable(name = "teamId") final Long teamId) {
 
-        GetTodoList getTodoList = todoQueryService.getTodoList(teamId);
+        GetTodoList getTodoList = todoQueryService.getTodoList(auth.member().getId(), teamId);
 
         return ApiPayload.onSuccess(getTodoList);
     }

@@ -1,6 +1,8 @@
 package kr.teammanagers.todo.application;
 
 import kr.teammanagers.common.Status;
+import kr.teammanagers.common.payload.code.status.ErrorStatus;
+import kr.teammanagers.global.exception.GeneralException;
 import kr.teammanagers.tag.dto.TagDto;
 import kr.teammanagers.tag.repository.TeamRoleRepository;
 import kr.teammanagers.team.repository.TeamManageRepository;
@@ -24,7 +26,7 @@ public class TodoQueryServiceImpl implements TodoQueryService {
     private final TeamRoleRepository teamRoleRepository;
 
     @Override
-    public GetTodoList getTodoList(Long teamId) {
+    public GetTodoList getTodoList(Long memberId, Long teamId) {
 
         List<TodoListDto> teamTodoListDtoList = teamManageRepository.findAllByTeamId(teamId).stream()
                 .map(teamManage -> {
@@ -47,6 +49,10 @@ public class TodoQueryServiceImpl implements TodoQueryService {
                     / flatTeamTodoDtoList.size();
         }
 
-        return GetTodoList.of(teamTodoListDtoList, progress);
+        Long ownerTeamManageId = teamManageRepository.findByMemberIdAndTeamId(memberId, teamId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.TEAM_MANAGE_NOT_FOUND))
+                .getId();
+
+        return GetTodoList.of(ownerTeamManageId, teamTodoListDtoList, progress);
     }
 }
