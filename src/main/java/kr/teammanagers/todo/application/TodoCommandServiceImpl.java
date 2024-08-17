@@ -20,9 +20,9 @@ public class TodoCommandServiceImpl implements TodoCommandService {
     private final TeamManageRepository teamManageRepository;
 
     @Override
-    public void createTodo(CreateTodo request, Long memberId, Long teamId) {
+    public void createTodo(CreateTodo request, Long teamManageId) {
         Todo newTodo = request.toTodo();
-        newTodo.setTeamManage(teamManageRepository.findByMemberIdAndTeamId(memberId, teamId)
+        newTodo.setTeamManage(teamManageRepository.findById(teamManageId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.TEAM_MANAGE_NOT_FOUND)));
 
         todoRepository.save(newTodo);

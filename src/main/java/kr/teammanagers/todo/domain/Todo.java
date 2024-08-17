@@ -16,7 +16,7 @@ public class Todo extends AuditingField {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 30)
     private String title;
 
     @Column(nullable = false)
