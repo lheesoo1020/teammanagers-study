@@ -27,7 +27,7 @@ public class AlarmScheduler {
 
     @Scheduled(cron = "0 0 0 * * *")
     public void createAlarmCalendarRemind() {
-        List<TeamCalendar> teamCalendarList = teamCalendarRepository.findAllByIsAlarmed(true);
+        List<TeamCalendar> teamCalendarList = teamCalendarRepository.findAll();
         teamCalendarList.stream()
                 .filter(teamCalendar -> Period.between(LocalDate.now(), teamCalendar.getCalendar().getDate().toLocalDate())
                         .getDays() == 1)
