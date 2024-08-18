@@ -11,12 +11,14 @@ import java.util.List;
 @Builder
 public record MyTodoListDto(
         String title,
+        Long teamId,
         List<TagDto> teamTagList,
         List<TodoDto> todoList
 ) {
     public static MyTodoListDto of(final Team team, final List<Tag> tagList, final List<Todo> todoList) {
         return MyTodoListDto.builder()
                 .title(team.getTitle())
+                .teamId(team.getId())
                 .teamTagList(tagList.stream()
                         .map(TagDto::from)
                         .toList())
