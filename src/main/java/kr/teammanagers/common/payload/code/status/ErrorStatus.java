@@ -17,8 +17,11 @@ public enum ErrorStatus implements ErrorBaseCode {
     _FORBIDDEN(HttpStatus.FORBIDDEN, "403", "금지된 요청입니다."),
     _NOT_FOUND(HttpStatus.NOT_FOUND, "404", "찾을 수 없습니다."),
 
+
     // 팀 관련 응답
     TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "TEAM404", "존재하지 않는 팀입니다."),
+    TEAM_CONFLICT(HttpStatus.CONFLICT, "TEAM409", "이미 가입된 팀입니다."),
+    TEAM_PASSWORD_NOT_FOUND(HttpStatus.NOT_FOUND, "TEAM4041", "비밀번호가 일치하지 않습니다."),
 
     // 팀관리 관련 응답
     TEAM_MANAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "TEAMMANAGE404", "존재하지 않는 팀관리입니다."),

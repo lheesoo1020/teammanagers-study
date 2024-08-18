@@ -1,4 +1,4 @@
-package kr.teammanagers.team.application;
+package kr.teammanagers.team.application.query;
 
 import kr.teammanagers.team.dto.response.GetTeam;
 import kr.teammanagers.team.dto.response.GetTeamMember;

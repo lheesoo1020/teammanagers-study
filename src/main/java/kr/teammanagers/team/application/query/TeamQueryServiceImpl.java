@@ -1,4 +1,4 @@
-package kr.teammanagers.team.application;
+package kr.teammanagers.team.application.query;
 
 import kr.teammanagers.global.config.AmazonConfig;
 import kr.teammanagers.global.exception.GeneralException;
@@ -6,11 +6,12 @@ import kr.teammanagers.global.provider.AmazonS3Provider;
 import kr.teammanagers.tag.domain.Tag;
 import kr.teammanagers.tag.domain.TagTeam;
 import kr.teammanagers.tag.repository.TagTeamRepository;
+import kr.teammanagers.team.application.module.TeamModuleService;
+import kr.teammanagers.team.domain.Team;
 import kr.teammanagers.team.dto.SimpleTeamMemberDto;
 import kr.teammanagers.team.dto.response.GetTeam;
 import kr.teammanagers.team.dto.response.GetTeamMember;
 import kr.teammanagers.team.repository.TeamManageRepository;
-import kr.teammanagers.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,14 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static kr.teammanagers.common.payload.code.status.ErrorStatus.TEAM_MANAGE_NOT_FOUND;
-import static kr.teammanagers.common.payload.code.status.ErrorStatus.TEAM_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TeamQueryServiceImpl implements TeamQueryService {
 
-    private final TeamRepository teamRepository;
+    private final TeamModuleService teamModuleService;
     private final TagTeamRepository tagTeamRepository;
     private final TeamManageRepository teamManageRepository;
 
@@ -34,26 +34,21 @@ public class TeamQueryServiceImpl implements TeamQueryService {
 
     @Override
     public GetTeam getTeamById(final Long teamId) {
-        return teamRepository.findById(teamId)
-                .map(team -> {
-                    List<Tag> tagList = tagTeamRepository.findAllByTeamId(team.getId()).stream()
-                            .map(TagTeam::getTag).toList();
-                    return GetTeam.from(team, tagList,
-                            amazonS3Provider.generateUrl(amazonConfig.getTeamProfilePath(), team.getId()));
-                })
-                .orElseThrow(() -> new GeneralException(TEAM_NOT_FOUND));
+        Team team = teamModuleService.findById(teamId);
+        List<Tag> tagList = tagTeamRepository.findAllByTeamId(team.getId()).stream()
+                .map(TagTeam::getTag).toList();
+        return GetTeam.from(team, tagList,
+                amazonS3Provider.generateUrl(amazonConfig.getTeamProfilePath(), team.getId()));
     }
 
     @Override
     public GetTeam getTeamByTeamCode(final String teamCode) {
-        return teamRepository.findByTeamCode(teamCode)
-                .map(team -> {
-                    List<Tag> tagList = tagTeamRepository.findAllByTeamId(team.getId()).stream()
-                            .map(TagTeam::getTag).toList();
-                    return GetTeam.from(team, tagList,
-                            amazonS3Provider.generateUrl(amazonConfig.getTeamProfilePath(), team.getId()));
-                })
-                .orElse(null);
+        Team team = teamModuleService.findByTeamCode(teamCode);
+
+        List<Tag> tagList = tagTeamRepository.findAllByTeamId(team.getId()).stream()
+                .map(TagTeam::getTag).toList();
+        return GetTeam.from(team, tagList,
+                amazonS3Provider.generateUrl(amazonConfig.getTeamProfilePath(), team.getId()));
     }
 
     @Override

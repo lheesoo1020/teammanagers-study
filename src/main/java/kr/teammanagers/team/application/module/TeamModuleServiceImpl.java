@@ -15,8 +15,14 @@ public class TeamModuleServiceImpl implements TeamModuleService {
     private final TeamRepository teamRepository;
 
     @Override
-    public Team getTeamById(final Long id) {
+    public Team findById(final Long id) {
         return teamRepository.findById(id)
+                .orElseThrow(() -> new GeneralException(TEAM_NOT_FOUND));
+    }
+
+    @Override
+    public Team findByTeamCode(final String teamCode) {
+        return teamRepository.findByTeamCode(teamCode)
                 .orElseThrow(() -> new GeneralException(TEAM_NOT_FOUND));
     }
 }

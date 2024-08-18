@@ -1,4 +1,4 @@
-package kr.teammanagers.team.application;
+package kr.teammanagers.team.application.command;
 
 import kr.teammanagers.common.Status;
 import kr.teammanagers.global.config.AmazonConfig;
@@ -14,12 +14,14 @@ import kr.teammanagers.tag.domain.TagTeam;
 import kr.teammanagers.tag.domain.TeamRole;
 import kr.teammanagers.tag.repository.TagTeamRepository;
 import kr.teammanagers.tag.repository.TeamRoleRepository;
+import kr.teammanagers.team.application.module.TeamModuleService;
 import kr.teammanagers.team.domain.Team;
 import kr.teammanagers.team.domain.TeamManage;
 import kr.teammanagers.team.dto.TeamMemberDto;
 import kr.teammanagers.team.dto.request.CreateTeam;
 import kr.teammanagers.team.dto.request.CreateTeamComment;
 import kr.teammanagers.team.dto.request.CreateTeamPassword;
+import kr.teammanagers.team.dto.request.ValidatePassword;
 import kr.teammanagers.team.dto.response.CreateTeamResult;
 import kr.teammanagers.team.dto.response.UpdateTeamEndResult;
 import kr.teammanagers.team.repository.TeamManageRepository;
@@ -31,8 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-import static kr.teammanagers.common.payload.code.status.ErrorStatus.TEAM_MANAGE_NOT_FOUND;
-import static kr.teammanagers.common.payload.code.status.ErrorStatus.TEAM_NOT_FOUND;
+import static kr.teammanagers.common.payload.code.status.ErrorStatus.*;
 import static kr.teammanagers.team.constant.TeamConstant.*;
 
 @Service
@@ -40,6 +41,7 @@ import static kr.teammanagers.team.constant.TeamConstant.*;
 @RequiredArgsConstructor
 public class TeamCommandServiceImpl implements TeamCommandService {
 
+    private final TeamModuleService teamModuleService;
     private final TeamRepository teamRepository;
     private final MemberRepository memberRepository;
     private final TagTeamRepository tagTeamRepository;
@@ -83,6 +85,23 @@ public class TeamCommandServiceImpl implements TeamCommandService {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new GeneralException(TEAM_NOT_FOUND));
         team.updatePassword(request.password());
+    }
+
+    @Override
+    public void joinTeam(final Member auth, final Long teamId, final ValidatePassword request) {
+        if (teamModuleService.findById(teamId).getPassword().equals(request.password())) {
+            throw new GeneralException(TEAM_PASSWORD_NOT_FOUND);
+        }
+        if (teamManageRepository.existsByMemberIdAndTeamId(auth.getId(), teamId)) {
+            throw new GeneralException(TEAM_CONFLICT);
+        }
+
+        teamManageRepository.save(TeamManage.builder()
+                .isDeleted(false)
+                .member(auth)
+                .team(teamModuleService.findById(teamId))
+                .build()
+        );
     }
 
     @Override

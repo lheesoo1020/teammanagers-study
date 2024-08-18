@@ -2,7 +2,7 @@ package kr.teammanagers.team.exception.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import kr.teammanagers.team.application.TeamQueryService;
+import kr.teammanagers.team.application.query.TeamQueryService;
 import kr.teammanagers.team.dto.RegisterCommentDto;
 import lombok.RequiredArgsConstructor;
 

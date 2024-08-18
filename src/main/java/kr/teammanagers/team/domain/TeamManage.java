@@ -30,8 +30,9 @@ public class TeamManage extends AuditingField {
     private Team team;
 
     @Builder
-    private TeamManage(final Boolean isDeleted) {
+    private TeamManage(final Boolean isDeleted, final Member member, final Team team) {
         this.isDeleted = isDeleted;
+        this.member = member;
+        this.team = team;
     }
-
 }

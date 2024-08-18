@@ -1,8 +1,10 @@
-package kr.teammanagers.team.application;
+package kr.teammanagers.team.application.command;
 
+import kr.teammanagers.member.domain.Member;
 import kr.teammanagers.team.dto.request.CreateTeam;
 import kr.teammanagers.team.dto.request.CreateTeamComment;
 import kr.teammanagers.team.dto.request.CreateTeamPassword;
+import kr.teammanagers.team.dto.request.ValidatePassword;
 import kr.teammanagers.team.dto.response.CreateTeamResult;
 import kr.teammanagers.team.dto.response.UpdateTeamEndResult;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,6 +13,8 @@ public interface TeamCommandService {
     CreateTeamResult createTeam(Long authId, CreateTeam request, MultipartFile imageFile);
 
     void createTeamPassword(Long teamId, CreateTeamPassword request);
+
+    void joinTeam(Member auth, Long teamId, ValidatePassword request);
 
     UpdateTeamEndResult updateTeamState(Long authId, Long teamId);
 
