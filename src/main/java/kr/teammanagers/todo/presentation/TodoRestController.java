@@ -1,9 +1,10 @@
 package kr.teammanagers.todo.presentation;
 
+import jakarta.validation.Valid;
 import kr.teammanagers.auth.dto.PrincipalDetails;
 import kr.teammanagers.common.payload.code.ApiPayload;
-import kr.teammanagers.todo.application.TodoCommandService;
-import kr.teammanagers.todo.application.TodoQueryService;
+import kr.teammanagers.todo.application.command.TodoCommandService;
+import kr.teammanagers.todo.application.query.TodoQueryService;
 import kr.teammanagers.todo.dto.request.CreateTodo;
 import kr.teammanagers.todo.dto.request.UpdateTodo;
 import kr.teammanagers.todo.dto.response.GetTodoList;
@@ -21,7 +22,7 @@ public class TodoRestController {
 
     @PostMapping("/team/{teamManageId}/todo")
     public ApiPayload<Void> create(@AuthenticationPrincipal final PrincipalDetails auth,
-                                   @RequestBody final CreateTodo request,
+                                   @RequestBody @Valid final CreateTodo request,
                                    @PathVariable(name = "teamManageId") final Long teamManageId) {
 
         todoCommandService.createTodo(request, teamManageId);
@@ -39,7 +40,7 @@ public class TodoRestController {
 
     @PatchMapping("/todo/{todoId}")
     public ApiPayload<Void> updateTitle(@AuthenticationPrincipal final PrincipalDetails auth,
-                                        @RequestBody final UpdateTodo request,
+                                        @RequestBody @Valid final UpdateTodo request,
                                         @PathVariable(name = "todoId") final Long todoId) {
 
         todoCommandService.updateTodoTitle(request, todoId);
