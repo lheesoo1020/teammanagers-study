@@ -45,6 +45,14 @@ public class Member extends AuditingField {
         this.providerId = providerId;
     }
 
+    public void updateName(final String name) {
+        this.name = name;
+    }
+
+    public void updatePhoneNumber(final String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     public void updateBelong(final String belong) {
         this.belong = belong;
     }

@@ -37,6 +37,16 @@ public class AmazonS3Provider {
     }
 
     public String generateUrl(final String filePath, final Long id) {
+
+        // 버킷 내에서 파일이 존재하는지 확인
+        String fullPath = filePath + "/" + id;
+        boolean doesObjectExist = amazonS3.doesObjectExist(amazonConfig.getBucket(), fullPath);
+
+        if (!doesObjectExist) {
+            // 파일이 존재하지 않으면 null 또는 예외를 반환
+            return null;
+        }
+
         // 서명된 URL의 유효 기간 설정
         Date expiration = new Date();
         expiration.setTime(expiration.getTime() + 1000 * 60 * 60);

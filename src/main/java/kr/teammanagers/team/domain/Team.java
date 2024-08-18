@@ -39,6 +39,10 @@ public class Team extends AuditingField {
         this.password = password;
     }
 
+    public void updateTitle(final String title) {
+        this.title = title;
+    }
+
     public void updateTeamCode(final String teamCode) {
         this.teamCode = teamCode;
     }

@@ -18,10 +18,7 @@ import kr.teammanagers.team.application.module.TeamModuleService;
 import kr.teammanagers.team.domain.Team;
 import kr.teammanagers.team.domain.TeamManage;
 import kr.teammanagers.team.dto.TeamMemberDto;
-import kr.teammanagers.team.dto.request.CreateTeam;
-import kr.teammanagers.team.dto.request.CreateTeamComment;
-import kr.teammanagers.team.dto.request.CreateTeamPassword;
-import kr.teammanagers.team.dto.request.ValidatePassword;
+import kr.teammanagers.team.dto.request.*;
 import kr.teammanagers.team.dto.response.CreateTeamResult;
 import kr.teammanagers.team.dto.response.UpdateTeamEndResult;
 import kr.teammanagers.team.repository.TeamManageRepository;
@@ -79,6 +76,35 @@ public class TeamCommandServiceImpl implements TeamCommandService {
         teamManageRepository.save(admin);
         return CreateTeamResult.from(team);
     }
+
+    @Override
+    public void updateTeam(final Long teamId, final UpdateTeam request, final MultipartFile imageFile) {
+        Team team = teamModuleService.findById(teamId);
+
+        updateTeamTitle(request.title(), team);
+        updateProfileImageIfPresent(imageFile, team);
+    }
+
+    private void updateProfileImageIfPresent(final MultipartFile imageFile, final Team team) {
+        if (imageFile != null && !imageFile.isEmpty()) {
+            updateProfileImage(imageFile, team);
+        }
+    }
+
+    private void updateProfileImage(final MultipartFile imageFile, final Team team) {
+        String teamProfilePath = amazonConfig.getTeamProfilePath();
+        if (amazonS3Provider.isFileExist(teamProfilePath, team.getId())) {
+            amazonS3Provider.deleteFile(teamProfilePath, team.getId());
+        }
+        amazonS3Provider.uploadImage(teamProfilePath, team.getId(), imageFile);
+    }
+
+    private void updateTeamTitle(final String title, final Team team) {
+        if (title != null) {
+            team.updateTitle(title);
+        }
+    }
+
 
     @Override
     public void createTeamPassword(final Long teamId, final CreateTeamPassword request) {

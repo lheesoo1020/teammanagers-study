@@ -34,6 +34,8 @@ public class MemberCommandServiceImpl implements MemberCommandService {
     public void updateProfile(final Long authId, final UpdateProfile request, final MultipartFile imageFile) {
         Member member = memberRepository.findById(authId).orElseThrow(RuntimeException::new);       // TODO : 예외 처리 필요
 
+        updateMemberName(request.name(), member);
+        updateMemberPhoneNumber(request.phoneNumber(), member);
         updateMemberBelong(request.belong(), member);
         updateConfidentRoles(request.confidentRole(), member);
         updateProfileImageIfPresent(imageFile, member);
@@ -51,6 +53,18 @@ public class MemberCommandServiceImpl implements MemberCommandService {
             amazonS3Provider.deleteFile(memberProfilePath, member.getId());
         }
         amazonS3Provider.uploadImage(memberProfilePath, member.getId(), imageFile);
+    }
+
+    private void updateMemberPhoneNumber(final String phoneNumber, final Member member) {
+        if (phoneNumber != null) {
+            member.updatePhoneNumber(phoneNumber);
+        }
+    }
+
+    private void updateMemberName(final String name, final Member member) {
+        if (name != null) {
+            member.updateName(name);
+        }
     }
 
     private void updateMemberBelong(final String belong, final Member member) {

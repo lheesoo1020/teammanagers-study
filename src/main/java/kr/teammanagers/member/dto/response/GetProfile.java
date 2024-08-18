@@ -13,6 +13,7 @@ import java.util.List;
 public record GetProfile(
         String imageUrl,
         String name,
+        String phoneNumber,
         String belong,
         List<TagDto> confidentRole,
         List<CommentDto> commentList
@@ -22,6 +23,7 @@ public record GetProfile(
         return GetProfile.builder()
                 .imageUrl(imageUrl)
                 .name(member.getName())
+                .phoneNumber(member.getPhoneNumber())
                 .belong(member.getBelong())
                 .confidentRole(
                         tagList.stream()

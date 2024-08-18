@@ -29,6 +29,7 @@ public record OAuth2UserInfo(
     private static OAuth2UserInfo ofGoogle(Map<String, Object> attributes) {
         return OAuth2UserInfo.builder()
                 .providerId((String) attributes.get("sub"))
+                .name(((String) attributes.get("email")).split("@")[0])
                 .email((String) attributes.get("email"))
                 .build();
     }
