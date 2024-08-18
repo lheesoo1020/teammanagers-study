@@ -1,4 +1,4 @@
-package kr.teammanagers.notice.application;
+package kr.teammanagers.notice.application.command;
 
 import kr.teammanagers.notice.dto.request.CreateNotice;
 

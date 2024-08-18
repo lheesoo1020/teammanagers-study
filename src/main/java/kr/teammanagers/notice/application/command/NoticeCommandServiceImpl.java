@@ -1,10 +1,10 @@
-package kr.teammanagers.notice.application;
+package kr.teammanagers.notice.application.command;
 
+import kr.teammanagers.notice.application.module.NoticeModuleService;
 import kr.teammanagers.notice.domain.Notice;
 import kr.teammanagers.notice.dto.request.CreateNotice;
-import kr.teammanagers.notice.repository.NoticeRepository;
+import kr.teammanagers.team.application.module.TeamModuleService;
 import kr.teammanagers.team.domain.Team;
-import kr.teammanagers.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,15 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class NoticeCommandServiceImpl implements NoticeCommandService {
 
-    private final NoticeRepository noticeRepository;
-    private final TeamRepository teamRepository;
+    private final NoticeModuleService noticeModuleService;
+    private final TeamModuleService teamModuleService;
 
     @Override
     public void createNotice(final Long teamId, final CreateNotice request) {
-        Team team = teamRepository.findById(teamId).orElseThrow(RuntimeException::new);
+        Team team = teamModuleService.getTeamById(teamId);
         Notice notice = request.toNotice();
         notice.setTeam(team);
-
-        noticeRepository.save(notice);
+        noticeModuleService.saveNotice(notice);
     }
 }

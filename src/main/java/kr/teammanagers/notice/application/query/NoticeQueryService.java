@@ -1,4 +1,4 @@
-package kr.teammanagers.notice.application;
+package kr.teammanagers.notice.application.query;
 
 import kr.teammanagers.notice.dto.response.GetNoticeList;
 import kr.teammanagers.notice.dto.response.GetNoticeRecent;

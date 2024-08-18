@@ -1,9 +1,10 @@
-package kr.teammanagers.notice.application;
+package kr.teammanagers.notice.application.query;
 
+import kr.teammanagers.notice.application.module.NoticeModuleService;
+import kr.teammanagers.notice.domain.Notice;
 import kr.teammanagers.notice.dto.NoticeDto;
 import kr.teammanagers.notice.dto.response.GetNoticeList;
 import kr.teammanagers.notice.dto.response.GetNoticeRecent;
-import kr.teammanagers.notice.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,11 +16,11 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class NoticeQueryServiceImpl implements NoticeQueryService {
 
-    private final NoticeRepository noticeRepository;
+    private final NoticeModuleService noticeModuleService;
 
     @Override
     public GetNoticeList getNoticeList(final Long teamId) {
-        List<NoticeDto> noticeDtoList = noticeRepository.findAllByTeamId(teamId).stream()
+        List<NoticeDto> noticeDtoList = noticeModuleService.getAllNoticeByTeamId(teamId).stream()
                 .map(NoticeDto::from)
                 .toList();
         return GetNoticeList.from(noticeDtoList);
@@ -27,9 +28,10 @@ public class NoticeQueryServiceImpl implements NoticeQueryService {
 
     @Override
     public GetNoticeRecent getNoticeRecent(final Long teamId) {
-        return noticeRepository.findFirstByTeamId(teamId)
-                .map(NoticeDto::from)
-                .map(GetNoticeRecent::from)
-                .orElse(null);
+        Notice notice = noticeModuleService.getFirstNoticeByTeamId(teamId);
+        if (notice != null) {
+            return GetNoticeRecent.from(NoticeDto.from(notice));
+        }
+        return null;
     }
 }

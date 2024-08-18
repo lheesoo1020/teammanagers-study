@@ -1,5 +1,6 @@
 package kr.teammanagers.memo.presentation;
 
+import jakarta.validation.Valid;
 import kr.teammanagers.auth.dto.PrincipalDetails;
 import kr.teammanagers.common.payload.code.ApiPayload;
 import kr.teammanagers.memo.application.MemoCommandService;
@@ -23,7 +24,7 @@ public class MemoController {
     public ApiPayload<Void> create(
             @AuthenticationPrincipal final PrincipalDetails auth,
             @PathVariable("teamId") final Long teamId,
-            @RequestBody final CreateMemo createMemo
+            @RequestBody @Valid final CreateMemo createMemo
     ) {
         memoCommandService.createMemo(teamId, createMemo);
         return ApiPayload.onSuccess();
@@ -42,7 +43,7 @@ public class MemoController {
     public ApiPayload<Void> update(
             @AuthenticationPrincipal final PrincipalDetails auth,
             @PathVariable("memoId") final Long memoId,
-            @RequestBody final UpdateMemo updateMemo
+            @RequestBody @Valid final UpdateMemo updateMemo
     ) {
         memoCommandService.updateMemo(memoId, updateMemo);
         return ApiPayload.onSuccess();
