@@ -36,7 +36,11 @@ public enum ErrorStatus implements ErrorBaseCode {
     ALARM_NOT_FOUND(HttpStatus.NOT_FOUND, "ALARM404", "존재하지 않는 알림입니다."),
 
     // 스케줄 관련 응답
-    SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "SCHEDULE404", "존재하지 않는 스케줄입니다.")
+    SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "SCHEDULE404", "존재하지 않는 스케줄입니다."),
+
+    // 메모 관련 응답
+    MEMO_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMO404", "존재하지 않는 메모입니다."),
+
     ;
 
     private final HttpStatus httpStatus;

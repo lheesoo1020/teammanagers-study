@@ -3,10 +3,11 @@ package kr.teammanagers.memo.presentation;
 import jakarta.validation.Valid;
 import kr.teammanagers.auth.dto.PrincipalDetails;
 import kr.teammanagers.common.payload.code.ApiPayload;
-import kr.teammanagers.memo.application.MemoCommandService;
-import kr.teammanagers.memo.application.MemoQueryService;
+import kr.teammanagers.memo.application.command.MemoCommandService;
+import kr.teammanagers.memo.application.query.MemoQueryService;
 import kr.teammanagers.memo.dto.request.CreateMemo;
 import kr.teammanagers.memo.dto.request.UpdateMemo;
+import kr.teammanagers.memo.dto.response.GetMemo;
 import kr.teammanagers.memo.dto.response.GetMemoList;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,11 +32,20 @@ public class MemoController {
     }
 
     @GetMapping("/team/{teamId}/memo")
-    public ApiPayload<GetMemoList> get(
+    public ApiPayload<GetMemoList> getList(
             @AuthenticationPrincipal final PrincipalDetails auth,
             @PathVariable("teamId") final Long teamId
     ) {
         GetMemoList result = memoQueryService.getMemoList(teamId);
+        return ApiPayload.onSuccess(result);
+    }
+
+    @GetMapping("/memo/{memoId}")
+    public ApiPayload<GetMemo> get(
+            @AuthenticationPrincipal final PrincipalDetails auth,
+            @PathVariable("memoId") final Long memoId
+    ) {
+        GetMemo result = memoQueryService.getMemo(memoId);
         return ApiPayload.onSuccess(result);
     }
 

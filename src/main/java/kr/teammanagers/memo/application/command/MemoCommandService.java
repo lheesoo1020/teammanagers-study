@@ -1,4 +1,4 @@
-package kr.teammanagers.memo.application;
+package kr.teammanagers.memo.application.command;
 
 import kr.teammanagers.memo.dto.request.CreateMemo;
 import kr.teammanagers.memo.dto.request.UpdateMemo;

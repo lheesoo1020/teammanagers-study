@@ -1,9 +1,9 @@
-package kr.teammanagers.memo.application;
+package kr.teammanagers.memo.application.command;
 
+import kr.teammanagers.memo.application.module.MemoModuleService;
 import kr.teammanagers.memo.domain.Memo;
 import kr.teammanagers.memo.dto.request.CreateMemo;
 import kr.teammanagers.memo.dto.request.UpdateMemo;
-import kr.teammanagers.memo.repository.MemoRepository;
 import kr.teammanagers.tag.application.module.TagCommandModuleService;
 import kr.teammanagers.tag.domain.TagMemo;
 import kr.teammanagers.tag.repository.TagMemoRepository;
@@ -20,7 +20,7 @@ import java.util.List;
 @Transactional
 public class MemoCommandServiceImpl implements MemoCommandService {
 
-    private final MemoRepository memoRepository;
+    private final MemoModuleService memoModuleService;
     private final TeamRepository teamRepository;
     private final TagMemoRepository tagMemoRepository;
 
@@ -31,7 +31,7 @@ public class MemoCommandServiceImpl implements MemoCommandService {
         Team team = teamRepository.findById(teamId).orElseThrow(RuntimeException::new);
         Memo memo = request.toMemo();
         memo.setTeam(team);
-        memoRepository.save(memo);
+        memoModuleService.save(memo);
 
         request.tagList().stream()
                 .map(tagCommandModuleService::findOrCreateTag)
@@ -47,7 +47,7 @@ public class MemoCommandServiceImpl implements MemoCommandService {
 
     @Override
     public void updateMemo(final Long memoId, final UpdateMemo request) {
-        Memo memo = memoRepository.findById(memoId).orElseThrow(RuntimeException::new);
+        Memo memo = memoModuleService.findById(memoId);
 
         updateTitle(request.title(), memo);
         updateTagMemoList(request.tagList(), memo);
@@ -62,7 +62,7 @@ public class MemoCommandServiceImpl implements MemoCommandService {
                     tagMemoRepository.delete(tagMemo);
                     tagCommandModuleService.validateAndDeleteTagByTagId(oldTagId);
                 });
-        memoRepository.deleteById(memoId);
+        memoModuleService.deleteById(memoId);
     }
 
     private void updateTitle(final String title, final Memo memo) {
