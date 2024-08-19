@@ -26,10 +26,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String accessToken = tokenProvider.generateAccessToken(authentication);
         tokenProvider.generateRefreshToken(authentication, accessToken);
 
-        // 요청을 보낸 원래의 URL 가져오기
-        String referer = request.getHeader("Referer");
-        String baseUrl = referer != null ? referer.split("/login")[0] : "https://teammanagers.kr";
-        String redirectUrl = baseUrl + "/login";
+        String redirectUrl = "https://teammanagers.kr" + "/login";
 
         redirectUrl = UriComponentsBuilder.fromUriString(redirectUrl)
                 .queryParam("accessToken", accessToken)
