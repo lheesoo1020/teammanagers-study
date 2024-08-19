@@ -115,7 +115,7 @@ public class TeamCommandServiceImpl implements TeamCommandService {
 
     @Override
     public void joinTeam(final Member auth, final Long teamId, final ValidatePassword request) {
-        if (teamModuleService.findById(teamId).getPassword().equals(request.password())) {
+        if (!teamModuleService.findById(teamId).getPassword().equals(request.password())) {
             throw new GeneralException(TEAM_PASSWORD_NOT_FOUND);
         }
         if (teamManageRepository.existsByMemberIdAndTeamId(auth.getId(), teamId)) {
