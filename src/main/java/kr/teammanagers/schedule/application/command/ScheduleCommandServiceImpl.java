@@ -1,11 +1,13 @@
-package kr.teammanagers.schedule.application;
+package kr.teammanagers.schedule.application.command;
 
 import kr.teammanagers.common.payload.code.status.ErrorStatus;
 import kr.teammanagers.global.exception.GeneralException;
+import kr.teammanagers.schedule.application.module.ScheduleModuleService;
 import kr.teammanagers.schedule.domain.Schedule;
 import kr.teammanagers.schedule.dto.request.CreateSchedule;
 import kr.teammanagers.schedule.dto.request.UpdateSchedule;
 import kr.teammanagers.schedule.repository.ScheduleRepository;
+import kr.teammanagers.team.application.module.TeamModuleService;
 import kr.teammanagers.team.domain.TeamManage;
 import kr.teammanagers.team.repository.TeamManageRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,26 +19,24 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ScheduleCommandServiceImpl implements ScheduleCommandService{
 
-    private final ScheduleRepository scheduleRepository;
-    private final TeamManageRepository teamManageRepository;
+    private final ScheduleModuleService scheduleModuleService;
+    private final TeamModuleService teamModuleService;
 
     @Override
     public void create(Long memberId, Long teamId, CreateSchedule request) {
-        TeamManage teamManage = teamManageRepository.findByMemberIdAndTeamId(memberId, teamId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.TEAM_MANAGE_NOT_FOUND));
+        TeamManage teamManage = teamModuleService.getTeamManageByMemberIdAndTeamId(memberId, teamId);
 
         Schedule newSchedule = request.toSchedule();
         newSchedule.setTeamManage(teamManage);
 
-        scheduleRepository.save(newSchedule);
+        scheduleModuleService.saveSchedule(newSchedule);
     }
 
     @Override
     public void update(Long memberId, Long teamId, UpdateSchedule request) {
-        TeamManage teamManage = teamManageRepository.findByMemberIdAndTeamId(memberId, teamId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.TEAM_MANAGE_NOT_FOUND));
+        TeamManage teamManage = teamModuleService.getTeamManageByMemberIdAndTeamId(memberId, teamId);
 
-        Schedule scheduleForUpdate = scheduleRepository.findByTeamManageId(teamManage.getId())
+        Schedule scheduleForUpdate = scheduleModuleService.getScheduleByTeamManageId(teamManage.getId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.SCHEDULE_NOT_FOUND));
 
         scheduleForUpdate.update(
@@ -51,10 +51,9 @@ public class ScheduleCommandServiceImpl implements ScheduleCommandService{
     }
 
     @Override
-    public void delete(Long memberId, Long teamId) {
-        TeamManage teamManage = teamManageRepository.findByMemberIdAndTeamId(memberId, teamId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.TEAM_MANAGE_NOT_FOUND));
+    public void delete(Long teamManageId) {
+        TeamManage teamManage = teamModuleService.getTeamManageById(teamManageId);
 
-        scheduleRepository.deleteByTeamManageId(teamManage.getId());
+        scheduleModuleService.deleteScheduleByTeamManageId(teamManage.getId());
     }
 }

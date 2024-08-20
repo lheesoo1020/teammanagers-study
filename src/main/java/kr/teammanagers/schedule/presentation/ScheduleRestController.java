@@ -2,8 +2,8 @@ package kr.teammanagers.schedule.presentation;
 
 import kr.teammanagers.auth.dto.PrincipalDetails;
 import kr.teammanagers.common.payload.code.ApiPayload;
-import kr.teammanagers.schedule.application.ScheduleCommandService;
-import kr.teammanagers.schedule.application.ScheduleQueryService;
+import kr.teammanagers.schedule.application.command.ScheduleCommandService;
+import kr.teammanagers.schedule.application.query.ScheduleQueryService;
 import kr.teammanagers.schedule.dto.request.CreateSchedule;
 import kr.teammanagers.schedule.dto.request.UpdateSchedule;
 import kr.teammanagers.schedule.dto.response.GetTeamSchedule;
@@ -39,11 +39,11 @@ public class ScheduleRestController {
         return ApiPayload.onSuccess();
     }
 
-    @DeleteMapping("/team/{teamId}/schedule")
+    @DeleteMapping("/team/{teamManageId}/schedule")
     public ApiPayload<Void> deleteSchedule(@AuthenticationPrincipal final PrincipalDetails auth,
-                                           @PathVariable(name = "teamId") final Long teamId) {
+                                           @PathVariable(name = "teamManageId") final Long teamManageId) {
 
-        scheduleCommandService.delete(auth.member().getId(), teamId);
+        scheduleCommandService.delete(teamManageId);
 
         return ApiPayload.onSuccess();
     }

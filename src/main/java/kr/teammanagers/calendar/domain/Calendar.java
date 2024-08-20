@@ -20,9 +20,10 @@ public class Calendar extends AuditingField {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 30)
     private String title;
 
+    @Column(length = 100)
     private String content;
 
     @Column(nullable = false)

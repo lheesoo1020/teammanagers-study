@@ -1,14 +1,12 @@
-package kr.teammanagers.schedule.application;
+package kr.teammanagers.schedule.application.query;
 
-import kr.teammanagers.common.payload.code.status.ErrorStatus;
-import kr.teammanagers.global.exception.GeneralException;
+import kr.teammanagers.schedule.application.module.ScheduleModuleService;
 import kr.teammanagers.schedule.domain.Schedule;
 import kr.teammanagers.schedule.domain.TimeTable;
 import kr.teammanagers.schedule.dto.ScheduleDto;
 import kr.teammanagers.schedule.dto.response.GetTeamSchedule;
 import kr.teammanagers.schedule.repository.ScheduleRepository;
-import kr.teammanagers.team.domain.TeamManage;
-import kr.teammanagers.team.repository.TeamManageRepository;
+import kr.teammanagers.team.application.module.TeamModuleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,14 +21,14 @@ import java.util.stream.IntStream;
 @Transactional(readOnly = true)
 public class ScheduleQueryServiceImpl implements ScheduleQueryService {
 
-    private final ScheduleRepository scheduleRepository;
-    private final TeamManageRepository teamManageRepository;
+    private final ScheduleModuleService scheduleModuleService;
+    private final TeamModuleService teamModuleService;
 
     @Override
     public GetTeamSchedule getTeamSchedule(long teamId) {
 
-        List<Schedule> teamScheduleList = teamManageRepository.findAllByTeamId(teamId).stream()
-                .map(teamManage -> scheduleRepository.findByTeamManageId(teamManage.getId()))
+        List<Schedule> teamScheduleList = teamModuleService.getTeamManageListByTeamId(teamId).stream()
+                .map(teamManage -> scheduleModuleService.getScheduleByTeamManageId(teamManage.getId()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
