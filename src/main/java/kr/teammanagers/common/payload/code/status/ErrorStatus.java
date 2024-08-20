@@ -31,6 +31,7 @@ public enum ErrorStatus implements ErrorBaseCode {
 
     // 멤버 관련 응답
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER404", "존재하지 않는 유저입니다."),
+    MEMBER_SOCIAL_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4041", "존재하지 않는 소셜 타입입니다."),
 
     // 일정 관련 응답
     CALENDAR_NOT_FOUND(HttpStatus.NOT_FOUND, "CALENDAR404", "존재하지 않는 일정입니다."),

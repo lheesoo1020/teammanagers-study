@@ -2,6 +2,9 @@ package kr.teammanagers.member.domain;
 
 import jakarta.persistence.*;
 import kr.teammanagers.common.AuditingField;
+import kr.teammanagers.common.payload.code.status.ErrorStatus;
+import kr.teammanagers.global.exception.GeneralException;
+import kr.teammanagers.member.dto.SocialType;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -55,5 +58,14 @@ public class Member extends AuditingField {
 
     public void updateBelong(final String belong) {
         this.belong = belong;
+    }
+
+    public SocialType judgeLoginProcess() {
+        return switch (this.providerId.length()) {
+            case 43 -> SocialType.NAVER;
+            case 10 -> SocialType.KAKAO;
+            case 21 -> SocialType.GOOGLE;
+            default -> throw new GeneralException(ErrorStatus.MEMBER_SOCIAL_TYPE_NOT_FOUND);
+        };
     }
 }
