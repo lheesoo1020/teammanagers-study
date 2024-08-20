@@ -5,7 +5,6 @@ import kr.teammanagers.schedule.domain.Schedule;
 import kr.teammanagers.schedule.domain.TimeTable;
 import kr.teammanagers.schedule.dto.ScheduleDto;
 import kr.teammanagers.schedule.dto.response.GetTeamSchedule;
-import kr.teammanagers.schedule.repository.ScheduleRepository;
 import kr.teammanagers.team.application.module.TeamModuleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

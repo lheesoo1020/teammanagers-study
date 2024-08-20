@@ -1,6 +1,7 @@
 package kr.teammanagers.team.application.query;
 
 import kr.teammanagers.team.dto.response.GetTeam;
+import kr.teammanagers.team.dto.response.GetSimpleTeamMember;
 import kr.teammanagers.team.dto.response.GetTeamMember;
 
 public interface TeamQueryService {
@@ -9,6 +10,8 @@ public interface TeamQueryService {
     GetTeam getTeamByTeamCode(String teamCode);
 
     GetTeamMember getTeamMember(Long teamId);
+
+    GetSimpleTeamMember getSimpleTeamMember(Long teamId);
 
     Long countTeamMembersByTeamManageId(Long teamManageId);
 }

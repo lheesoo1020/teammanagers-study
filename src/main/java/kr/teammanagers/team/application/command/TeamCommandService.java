@@ -18,4 +18,6 @@ public interface TeamCommandService {
     UpdateTeamEndResult updateTeamState(Long authId, Long teamId);
 
     void createComment(CreateTeamComment request);
+
+    void exitTeam(Long authId, Long teamId);
 }

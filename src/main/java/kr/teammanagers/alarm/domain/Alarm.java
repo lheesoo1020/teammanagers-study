@@ -31,7 +31,7 @@ public class Alarm extends AuditingField {
     private Boolean isRead;
 
     @Setter
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "teamManage_id")
     private TeamManage teamManage;
 

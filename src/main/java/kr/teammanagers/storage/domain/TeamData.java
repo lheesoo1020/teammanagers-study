@@ -47,9 +47,10 @@ public class TeamData extends AuditingField {
 
     // Mapping
     @Setter
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "team_manage_id")
     private TeamManage teamManage;
+
     @Builder
     private TeamData(final String title, final String size, final String fileUrl) {
         this.title = title;

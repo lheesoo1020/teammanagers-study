@@ -1,15 +1,15 @@
 package kr.teammanagers.team.dto.response;
 
-import kr.teammanagers.team.dto.SimpleTeamMemberDto;
+import kr.teammanagers.team.dto.TeamMemberDto;
 import lombok.Builder;
 
 import java.util.List;
 
 @Builder
 public record GetTeamMember(
-        List<SimpleTeamMemberDto> teamMember
+        List<TeamMemberDto> teamMember
 ) {
-    public static GetTeamMember from(final List<SimpleTeamMemberDto> teamMember) {
+    public static GetTeamMember from(List<TeamMemberDto> teamMember) {
         return GetTeamMember.builder()
                 .teamMember(teamMember)
                 .build();

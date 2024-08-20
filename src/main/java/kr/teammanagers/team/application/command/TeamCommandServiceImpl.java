@@ -1,6 +1,7 @@
 package kr.teammanagers.team.application.command;
 
 import kr.teammanagers.common.Status;
+import kr.teammanagers.common.payload.code.status.ErrorStatus;
 import kr.teammanagers.global.config.AmazonConfig;
 import kr.teammanagers.global.exception.GeneralException;
 import kr.teammanagers.global.provider.AmazonS3Provider;
@@ -161,6 +162,17 @@ public class TeamCommandServiceImpl implements TeamCommandService {
                     comment.setMember(memberRepository.getReferenceById(memberId));
                     commentRepository.save(comment);
                 });
+    }
+
+    @Override
+    public void exitTeam(final Long authId, final Long teamId) {
+        TeamManage teamManage = teamManageRepository.findByMemberIdAndTeamId(authId, teamId)
+                .orElseThrow(() -> new GeneralException(TEAM_MANAGE_NOT_FOUND));
+        List<TeamRole> teamRoleList = teamRoleRepository.findAllByTeamManageId(teamManage.getId());
+        List<Tag> tagList = teamRoleList.stream().map(TeamRole::getTag).toList();
+        teamManageRepository.delete(teamManage);
+        teamRoleRepository.deleteAll(teamRoleList);
+        tagList.forEach(tag -> tagCommandModuleService.validateAndDeleteTagByTagId(tag.getId()));
     }
 
     private String encodeNumberToChars(final Long teamId) {
