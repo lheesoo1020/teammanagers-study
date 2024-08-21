@@ -62,7 +62,8 @@ public class CalendarRestController {
     }
 
     @PatchMapping("/calendar/{calendarId}")
-    public ApiPayload<Void> updateCalendar(@RequestBody final UpdateCalendar request,
+    public ApiPayload<Void> updateCalendar(@AuthenticationPrincipal final PrincipalDetails auth,
+                                           @RequestBody final UpdateCalendar request,
                                            @PathVariable(name = "calendarId") final Long calendarId) {
 
         calendarCommandService.update(request, calendarId);
@@ -71,7 +72,8 @@ public class CalendarRestController {
     }
 
     @PatchMapping("/calendar/{calendarId}/state")
-    public ApiPayload<Void> updateCalendarState(@PathVariable(name = "calendarId") final Long calendarId) {
+    public ApiPayload<Void> updateCalendarState(@AuthenticationPrincipal final PrincipalDetails auth,
+                                                @PathVariable(name = "calendarId") final Long calendarId) {
 
         calendarCommandService.updateState(calendarId);
 
@@ -79,7 +81,8 @@ public class CalendarRestController {
     }
 
     @DeleteMapping("/calendar/{calendarId}")
-    public ApiPayload<Void> deleteCalendar(@PathVariable(name = "calendarId") final Long calendarId) {
+    public ApiPayload<Void> deleteCalendar(@AuthenticationPrincipal final PrincipalDetails auth,
+                                           @PathVariable(name = "calendarId") final Long calendarId) {
 
         calendarCommandService.delete(calendarId);
 

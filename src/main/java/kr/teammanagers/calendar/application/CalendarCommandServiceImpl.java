@@ -95,7 +95,7 @@ public class CalendarCommandServiceImpl implements CalendarCommandService {
         Calendar calendar = calendarRepository.findById(calendarId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.CALENDAR_NOT_FOUND));
 
-        teamCalendarRepository.deleteAll(teamCalendarRepository.findAllByCalendarId(calendarId));
+        teamCalendarRepository.deleteAllByCalendarId(calendarId);
         calendarRepository.delete(calendar);
     }
 
