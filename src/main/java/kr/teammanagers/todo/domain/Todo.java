@@ -21,11 +21,11 @@ public class Todo extends AuditingField {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.PROCEEDING;
 
     // Mapping
     @Setter
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_manage_id")
     private TeamManage teamManage;
 

@@ -25,7 +25,7 @@ public class TeamCalendar extends AuditingField {
     private Calendar calendar;
 
     @Setter
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_mange_id")
     private TeamManage teamManage;
 

@@ -64,8 +64,8 @@ public class CalendarQueryServiceImpl implements CalendarQueryService {
         Calendar calendar = calendarRepository.findById(calendarId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.CALENDAR_NOT_FOUND));
 
-        List<Long> participantList = teamCalendarRepository.findAllByCalendarId(calendar.getId())
-                        .stream().map(teamCalendar -> { return teamCalendar.getTeamManage().getId(); })
+        List<String> participantList = teamCalendarRepository.findAllByCalendarId(calendar.getId())
+                        .stream().map(teamCalendar -> { return teamCalendar.getTeamManage().getMember().getName(); })
                         .toList();
 
         return GetCalendar.from(CalendarDetailDto.of(calendar, participantList));

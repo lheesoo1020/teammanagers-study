@@ -10,9 +10,9 @@ public record CalendarDetailDto(
         Long calendarId,
         String title,
         String content,
-        List<Long> participants
+        List<String> participants
 ) {
-    public static CalendarDetailDto of(Calendar calendar, List<Long> participants) {
+    public static CalendarDetailDto of(Calendar calendar, List<String> participants) {
         return CalendarDetailDto.builder()
                 .calendarId(calendar.getId())
                 .title(calendar.getTitle())
