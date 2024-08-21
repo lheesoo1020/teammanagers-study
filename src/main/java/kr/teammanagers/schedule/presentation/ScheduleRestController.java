@@ -6,6 +6,7 @@ import kr.teammanagers.schedule.application.command.ScheduleCommandService;
 import kr.teammanagers.schedule.application.query.ScheduleQueryService;
 import kr.teammanagers.schedule.dto.request.CreateSchedule;
 import kr.teammanagers.schedule.dto.request.UpdateSchedule;
+import kr.teammanagers.schedule.dto.response.GetMySchedule;
 import kr.teammanagers.schedule.dto.response.GetTeamSchedule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -55,5 +56,14 @@ public class ScheduleRestController {
         GetTeamSchedule getTeamSchedule = scheduleQueryService.getTeamSchedule(teamId);
 
         return ApiPayload.onSuccess(getTeamSchedule);
+    }
+
+    @GetMapping("schedule/{teamId}")
+    public ApiPayload<GetMySchedule> getMySchedule(@AuthenticationPrincipal final PrincipalDetails auth,
+                                                   @PathVariable(name = "teamId") final Long teamId) {
+
+        GetMySchedule getMySchedule = scheduleQueryService.getMySchedule(auth.member().getId(), teamId);
+
+        return ApiPayload.onSuccess(getMySchedule);
     }
 }

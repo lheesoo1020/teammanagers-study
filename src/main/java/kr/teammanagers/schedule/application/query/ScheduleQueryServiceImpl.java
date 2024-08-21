@@ -1,11 +1,15 @@
 package kr.teammanagers.schedule.application.query;
 
+import kr.teammanagers.common.payload.code.status.ErrorStatus;
+import kr.teammanagers.global.exception.GeneralException;
 import kr.teammanagers.schedule.application.module.ScheduleModuleService;
 import kr.teammanagers.schedule.domain.Schedule;
 import kr.teammanagers.schedule.domain.TimeTable;
 import kr.teammanagers.schedule.dto.ScheduleDto;
+import kr.teammanagers.schedule.dto.response.GetMySchedule;
 import kr.teammanagers.schedule.dto.response.GetTeamSchedule;
 import kr.teammanagers.team.application.module.TeamModuleService;
+import kr.teammanagers.team.domain.TeamManage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +28,7 @@ public class ScheduleQueryServiceImpl implements ScheduleQueryService {
     private final TeamModuleService teamModuleService;
 
     @Override
-    public GetTeamSchedule getTeamSchedule(long teamId) {
+    public GetTeamSchedule getTeamSchedule(Long teamId) {
 
         List<Schedule> teamScheduleList = teamModuleService.getTeamManageListByTeamId(teamId).stream()
                 .map(teamManage -> scheduleModuleService.getScheduleByTeamManageId(teamManage.getId()))
@@ -47,6 +51,16 @@ public class ScheduleQueryServiceImpl implements ScheduleQueryService {
                         calculateIntersection(teamScheduleList, schedule -> schedule.getSunday().getValue())
                 )
         );
+    }
+
+    @Override
+    public GetMySchedule getMySchedule(Long memberId, Long teamId) {
+        TeamManage teamManage = teamModuleService.getTeamManageByMemberIdAndTeamId(memberId, teamId);
+
+        Schedule schedule = scheduleModuleService.getScheduleByTeamManageId(teamManage.getId())
+                .orElseThrow(() -> new GeneralException(ErrorStatus.SCHEDULE_NOT_FOUND));
+
+        return GetMySchedule.from(ScheduleDto.from(schedule));
     }
 
     public TimeTable calculateIntersection(List<Schedule> scheduleList, Function<Schedule, Character[]> function) {
