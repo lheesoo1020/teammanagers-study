@@ -12,6 +12,7 @@ import kr.teammanagers.calendar.repository.TeamCalendarRepository;
 import kr.teammanagers.common.payload.code.status.ErrorStatus;
 import kr.teammanagers.global.exception.GeneralException;
 import kr.teammanagers.team.domain.TeamManage;
+import kr.teammanagers.team.dto.SimpleTeamManageDto;
 import kr.teammanagers.team.repository.TeamManageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -64,8 +65,8 @@ public class CalendarQueryServiceImpl implements CalendarQueryService {
         Calendar calendar = calendarRepository.findById(calendarId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.CALENDAR_NOT_FOUND));
 
-        List<String> participantList = teamCalendarRepository.findAllByCalendarId(calendar.getId())
-                        .stream().map(teamCalendar -> { return teamCalendar.getTeamManage().getMember().getName(); })
+        List<SimpleTeamManageDto> participantList = teamCalendarRepository.findAllByCalendarId(calendar.getId())
+                        .stream().map(teamCalendar -> { return SimpleTeamManageDto.from(teamCalendar.getTeamManage()); })
                         .toList();
 
         return GetCalendar.from(CalendarDetailDto.of(calendar, participantList));
