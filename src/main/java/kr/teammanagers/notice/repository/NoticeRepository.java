@@ -10,5 +10,5 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
     List<Notice> findAllByTeamId(Long teamId);
 
-    Optional<Notice> findLastByTeamId(Long teamId);
+    Optional<Notice> findFirstByTeamIdOrderByCreatedAtDesc(Long teamId);
 }

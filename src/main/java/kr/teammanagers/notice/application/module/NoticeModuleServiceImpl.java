@@ -20,7 +20,7 @@ public class NoticeModuleServiceImpl implements NoticeModuleService {
 
     @Override
     public Notice getFirstNoticeByTeamId(final Long teamId) {
-        return noticeRepository.findLastByTeamId(teamId).orElse(null);
+        return noticeRepository.findFirstByTeamIdOrderByCreatedAtDesc(teamId).orElse(null);
     }
 
     @Override
