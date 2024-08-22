@@ -2,8 +2,8 @@ package kr.teammanagers.member.presentation;
 
 import kr.teammanagers.auth.dto.PrincipalDetails;
 import kr.teammanagers.common.payload.code.ApiPayload;
-import kr.teammanagers.member.application.MemberCommandService;
-import kr.teammanagers.member.application.MemberQueryService;
+import kr.teammanagers.member.application.command.MemberCommandService;
+import kr.teammanagers.member.application.query.MemberQueryService;
 import kr.teammanagers.member.dto.request.UpdateProfile;
 import kr.teammanagers.member.dto.response.*;
 import lombok.RequiredArgsConstructor;

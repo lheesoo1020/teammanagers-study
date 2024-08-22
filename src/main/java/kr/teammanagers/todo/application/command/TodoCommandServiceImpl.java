@@ -1,6 +1,7 @@
 package kr.teammanagers.todo.application.command;
 
 import kr.teammanagers.team.application.module.TeamModuleService;
+import kr.teammanagers.team.domain.TeamManage;
 import kr.teammanagers.todo.application.module.TodoModuleService;
 import kr.teammanagers.todo.domain.Todo;
 import kr.teammanagers.todo.dto.request.CreateTodo;
@@ -20,7 +21,7 @@ public class TodoCommandServiceImpl implements TodoCommandService {
     @Override
     public void createTodo(CreateTodo request, Long teamManageId) {
         Todo newTodo = request.toTodo();
-        newTodo.setTeamManage(teamModuleService.getTeamManageById(teamManageId));
+        newTodo.setTeamManage(teamModuleService.findById(teamManageId, TeamManage.class));
 
         todoModuleService.saveTodo(newTodo);
     }

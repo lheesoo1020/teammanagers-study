@@ -1,8 +1,8 @@
 package kr.teammanagers.calendar.presentation;
 
 import kr.teammanagers.auth.dto.PrincipalDetails;
-import kr.teammanagers.calendar.application.CalendarCommandService;
-import kr.teammanagers.calendar.application.CalendarQueryService;
+import kr.teammanagers.calendar.application.command.CalendarCommandService;
+import kr.teammanagers.calendar.application.query.CalendarQueryService;
 import kr.teammanagers.calendar.dto.request.CreateCalendar;
 import kr.teammanagers.calendar.dto.request.UpdateCalendar;
 import kr.teammanagers.calendar.dto.response.GetCalendar;
@@ -12,8 +12,6 @@ import kr.teammanagers.common.payload.code.ApiPayload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/api")

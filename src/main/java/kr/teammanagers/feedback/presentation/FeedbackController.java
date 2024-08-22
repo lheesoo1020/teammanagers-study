@@ -2,8 +2,8 @@ package kr.teammanagers.feedback.presentation;
 
 import kr.teammanagers.auth.dto.PrincipalDetails;
 import kr.teammanagers.common.payload.code.ApiPayload;
-import kr.teammanagers.feedback.application.FeedbackCommandService;
-import kr.teammanagers.feedback.application.FeedbackQueryService;
+import kr.teammanagers.feedback.application.command.FeedbackCommandService;
+import kr.teammanagers.feedback.application.query.FeedbackQueryService;
 import kr.teammanagers.feedback.dto.FeedbackDto;
 import kr.teammanagers.feedback.dto.request.CreateFeedbackRequest;
 import kr.teammanagers.feedback.dto.request.UpdateFeedbackRequest;

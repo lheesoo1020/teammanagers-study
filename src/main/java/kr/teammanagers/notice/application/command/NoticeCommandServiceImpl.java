@@ -19,7 +19,7 @@ public class NoticeCommandServiceImpl implements NoticeCommandService {
 
     @Override
     public void createNotice(final Long teamId, final CreateNotice request) {
-        Team team = teamModuleService.findById(teamId);
+        Team team = teamModuleService.findById(teamId, Team.class);
         Notice notice = request.toNotice();
         notice.setTeam(team);
         noticeModuleService.saveNotice(notice);

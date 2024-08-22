@@ -1,7 +1,7 @@
 package kr.teammanagers.alarm.presentation;
 
-import kr.teammanagers.alarm.application.AlarmCommandService;
-import kr.teammanagers.alarm.application.AlarmQueryService;
+import kr.teammanagers.alarm.application.command.AlarmCommandService;
+import kr.teammanagers.alarm.application.query.AlarmQueryService;
 import kr.teammanagers.alarm.dto.request.CreateAlarm;
 import kr.teammanagers.alarm.dto.response.GetAlarm;
 import kr.teammanagers.auth.dto.PrincipalDetails;

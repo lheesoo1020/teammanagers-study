@@ -1,9 +1,8 @@
 package kr.teammanagers.storage.presentation;
 
-import com.amazonaws.services.ec2.model.Storage;
 import kr.teammanagers.auth.dto.PrincipalDetails;
-import kr.teammanagers.storage.application.StorageCommandService;
-import kr.teammanagers.storage.application.StorageQueryService;
+import kr.teammanagers.storage.application.command.StorageCommandService;
+import kr.teammanagers.storage.application.query.StorageQueryService;
 import kr.teammanagers.storage.dto.StorageDto;
 import kr.teammanagers.storage.dto.request.CreateStorageRequest;
 import kr.teammanagers.storage.dto.response.StorageResponse;
@@ -14,7 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

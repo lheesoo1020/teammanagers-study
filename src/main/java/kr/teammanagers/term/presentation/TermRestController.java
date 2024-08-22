@@ -3,7 +3,7 @@ package kr.teammanagers.term.presentation;
 import kr.teammanagers.auth.dto.PrincipalDetails;
 import kr.teammanagers.common.payload.code.ApiPayload;
 import kr.teammanagers.term.dto.CreateTerms;
-import kr.teammanagers.term.application.TermCommandService;
+import kr.teammanagers.term.application.command.TermCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;

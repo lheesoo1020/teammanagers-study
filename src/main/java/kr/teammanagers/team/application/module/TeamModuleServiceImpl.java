@@ -22,35 +22,69 @@ public class TeamModuleServiceImpl implements TeamModuleService {
     private final TeamManageRepository teamManageRepository;
 
     @Override
-    public Team findById(final Long id) {
-        return teamRepository.findById(id)
-                .orElseThrow(() -> new GeneralException(TEAM_NOT_FOUND));
+    public <T> T save(final T entity, final Class<T> clazz) {
+        if (clazz.equals(Team.class)) {
+            return clazz.cast(teamRepository.save((Team) entity));
+        } else if (clazz.equals(TeamManage.class)) {
+            return clazz.cast(teamManageRepository.save((TeamManage) entity));
+        } else {
+            throw new IllegalArgumentException("Unsupported entity type: " + clazz);
+        }
     }
 
     @Override
-    public TeamManage getTeamManageById(Long id) {
-        return teamManageRepository.findById(id)
-                .orElseThrow(() -> new GeneralException(TEAM_MANAGE_NOT_FOUND));
+    public <T> T findById(final Long id, final Class<T> clazz) {
+        if (clazz.equals(Team.class)) {
+            return clazz.cast(teamRepository.findById(id)
+                    .orElseThrow(() -> new GeneralException(TEAM_NOT_FOUND)));
+        } else if (clazz.equals(TeamManage.class)) {
+            return clazz.cast(teamManageRepository.findById(id)
+                    .orElseThrow(() -> new GeneralException(TEAM_MANAGE_NOT_FOUND)));
+        } else {
+            throw new IllegalArgumentException("Unsupported entity type: " + clazz);
+        }
     }
 
     @Override
-    public TeamManage getTeamManageByMemberIdAndTeamId(Long memberId, Long teamId) {
+    public <T> void delete(final T entity, final Class<T> clazz) {
+        if (clazz.equals(Team.class)) {
+            teamRepository.delete((Team) entity);
+        } else if (clazz.equals(TeamManage.class)) {
+            teamManageRepository.delete((TeamManage) entity);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity type: " + clazz);
+        }
+    }
+
+    @Override
+    public TeamManage findTeamManageByMemberIdAndTeamId(Long memberId, Long teamId) {
         return teamManageRepository.findByMemberIdAndTeamId(memberId, teamId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.TEAM_MANAGE_NOT_FOUND));
     }
 
     @Override
-    public List<TeamManage> getTeamManageListByMemberId(Long memberId) {
-        return teamManageRepository.findAllByMemberId(memberId);
-    }
-
-    @Override
-    public List<TeamManage> getTeamManageListByTeamId(Long teamId) {
+    public List<TeamManage> findTeamManageAllByTeamId(Long teamId) {
         return teamManageRepository.findAllByTeamId(teamId);
     }
 
-    public Team findByTeamCode(final String teamCode) {
+    @Override
+    public Team findTeamByTeamCode(final String teamCode) {
         return teamRepository.findByTeamCode(teamCode)
                 .orElseThrow(() -> new GeneralException(TEAM_NOT_FOUND));
+    }
+
+    @Override
+    public boolean existsByMemberIdAndTeamId(final Long memberId, final Long teamId) {
+        return teamManageRepository.existsByMemberIdAndTeamId(memberId, teamId);
+    }
+
+    @Override
+    public boolean existsTeamManageByMemberIdAndTeamId(final Long memberId, final Long teamId) {
+        return teamManageRepository.existsByMemberIdAndTeamId(memberId, teamId);
+    }
+
+    @Override
+    public Long countTeamManageByTeamId(final Long teamId) {
+        return teamManageRepository.countByTeamId(teamId);
     }
 }

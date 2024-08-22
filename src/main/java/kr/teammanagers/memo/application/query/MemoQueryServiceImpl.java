@@ -5,9 +5,9 @@ import kr.teammanagers.memo.domain.Memo;
 import kr.teammanagers.memo.dto.MemoDto;
 import kr.teammanagers.memo.dto.response.GetMemo;
 import kr.teammanagers.memo.dto.response.GetMemoList;
+import kr.teammanagers.tag.application.module.TagModuleService;
 import kr.teammanagers.tag.domain.Tag;
 import kr.teammanagers.tag.domain.TagMemo;
-import kr.teammanagers.tag.repository.TagMemoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,14 +20,14 @@ import java.util.List;
 public class MemoQueryServiceImpl implements MemoQueryService {
 
     private final MemoModuleService memoModuleService;
-    private final TagMemoRepository tagMemoRepository;
+    private final TagModuleService tagModuleService;
 
     @Override
     public GetMemoList getMemoList(final Long teamId) {
         List<Memo> memoList = memoModuleService.findAllByTeamId(teamId);
         List<MemoDto> memoDtoList = memoList.stream()
                 .map(memo -> {
-                    List<Tag> tagList = tagMemoRepository.findAllByMemoId(memo.getId()).stream()
+                    List<Tag> tagList = tagModuleService.findAllTagMemoByMemoId(memo.getId()).stream()
                             .map(TagMemo::getTag).toList();
                     return MemoDto.of(memo, tagList);
                 }).toList();
@@ -38,7 +38,7 @@ public class MemoQueryServiceImpl implements MemoQueryService {
     @Override
     public GetMemo getMemo(final Long memoId) {
         Memo memo = memoModuleService.findById(memoId);
-        List<Tag> tagList = tagMemoRepository.findAllByMemoId(memoId).stream()
+        List<Tag> tagList = tagModuleService.findAllTagMemoByMemoId(memoId).stream()
                 .map(TagMemo::getTag).toList();
 
         return GetMemo.of(memo, tagList);

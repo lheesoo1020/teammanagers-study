@@ -2,7 +2,7 @@ package kr.teammanagers.tag.presentation;
 
 import kr.teammanagers.auth.dto.PrincipalDetails;
 import kr.teammanagers.common.payload.code.ApiPayload;
-import kr.teammanagers.tag.application.TagCommandService;
+import kr.teammanagers.tag.application.command.TagCommandService;
 import kr.teammanagers.tag.request.CreateRoleTag;
 import kr.teammanagers.tag.request.UpdateRoleTag;
 import kr.teammanagers.tag.request.UpdateTeamTag;

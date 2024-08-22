@@ -30,7 +30,7 @@ public class ScheduleQueryServiceImpl implements ScheduleQueryService {
     @Override
     public GetTeamSchedule getTeamSchedule(Long teamId) {
 
-        List<Schedule> teamScheduleList = teamModuleService.getTeamManageListByTeamId(teamId).stream()
+        List<Schedule> teamScheduleList = teamModuleService.findTeamManageAllByTeamId(teamId).stream()
                 .map(teamManage -> scheduleModuleService.getScheduleByTeamManageId(teamManage.getId()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -55,7 +55,7 @@ public class ScheduleQueryServiceImpl implements ScheduleQueryService {
 
     @Override
     public GetMySchedule getMySchedule(Long memberId, Long teamId) {
-        TeamManage teamManage = teamModuleService.getTeamManageByMemberIdAndTeamId(memberId, teamId);
+        TeamManage teamManage = teamModuleService.findTeamManageByMemberIdAndTeamId(memberId, teamId);
 
         return scheduleModuleService.getScheduleByTeamManageId(teamManage.getId())
                 .map(schedule -> GetMySchedule.from(ScheduleDto.from(schedule)))

@@ -1,22 +1,19 @@
 package kr.teammanagers.team.application.command;
 
-import kr.teammanagers.alarm.repository.AlarmRepository;
-import kr.teammanagers.calendar.repository.TeamCalendarRepository;
+import kr.teammanagers.alarm.application.module.AlarmModuleService;
+import kr.teammanagers.calendar.application.module.CalendarModuleService;
 import kr.teammanagers.common.Status;
 import kr.teammanagers.global.config.AmazonConfig;
 import kr.teammanagers.global.exception.GeneralException;
 import kr.teammanagers.global.provider.AmazonS3Provider;
+import kr.teammanagers.member.application.module.MemberModuleService;
 import kr.teammanagers.member.domain.Comment;
 import kr.teammanagers.member.domain.Member;
-import kr.teammanagers.member.repository.CommentRepository;
-import kr.teammanagers.member.repository.MemberRepository;
 import kr.teammanagers.schedule.application.module.ScheduleModuleService;
-import kr.teammanagers.tag.application.module.TagCommandModuleService;
+import kr.teammanagers.tag.application.module.TagModuleService;
 import kr.teammanagers.tag.domain.Tag;
 import kr.teammanagers.tag.domain.TagTeam;
 import kr.teammanagers.tag.domain.TeamRole;
-import kr.teammanagers.tag.repository.TagTeamRepository;
-import kr.teammanagers.tag.repository.TeamRoleRepository;
 import kr.teammanagers.team.application.module.TeamModuleService;
 import kr.teammanagers.team.domain.Team;
 import kr.teammanagers.team.domain.TeamManage;
@@ -24,8 +21,6 @@ import kr.teammanagers.team.dto.TeamMemberDto;
 import kr.teammanagers.team.dto.request.*;
 import kr.teammanagers.team.dto.response.CreateTeamResult;
 import kr.teammanagers.team.dto.response.UpdateTeamEndResult;
-import kr.teammanagers.team.repository.TeamManageRepository;
-import kr.teammanagers.team.repository.TeamRepository;
 import kr.teammanagers.todo.application.module.TodoModuleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,7 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-import static kr.teammanagers.common.payload.code.status.ErrorStatus.*;
+import static kr.teammanagers.common.payload.code.status.ErrorStatus.TEAM_CONFLICT;
+import static kr.teammanagers.common.payload.code.status.ErrorStatus.TEAM_PASSWORD_NOT_FOUND;
 import static kr.teammanagers.team.constant.TeamConstant.*;
 
 @Service
@@ -42,38 +38,34 @@ import static kr.teammanagers.team.constant.TeamConstant.*;
 @RequiredArgsConstructor
 public class TeamCommandServiceImpl implements TeamCommandService {
 
+    private final MemberModuleService memberModuleService;
+    private final TagModuleService tagModuleService;
     private final TeamModuleService teamModuleService;
-    private final TeamRepository teamRepository;
-    private final MemberRepository memberRepository;
-    private final TagTeamRepository tagTeamRepository;
-    private final TeamManageRepository teamManageRepository;
-    private final TeamRoleRepository teamRoleRepository;
-    private final CommentRepository commentRepository;
-    private final AlarmRepository alarmRepository;
-    private final TeamCalendarRepository teamCalendarRepository;
-
-    private final TodoModuleService todoModuleService;
     private final ScheduleModuleService scheduleModuleService;
-    private final TagCommandModuleService tagCommandModuleService;
-    private final AmazonS3Provider amazonS3Provider;
+    private final TodoModuleService todoModuleService;
+    private final AlarmModuleService alarmModuleService;
+    private final CalendarModuleService calendarModuleService;
+
     private final AmazonConfig amazonConfig;
+    private final AmazonS3Provider amazonS3Provider;
 
     @Override
     public CreateTeamResult createTeam(final Long authId, final CreateTeam request, final MultipartFile imageFile) {
-        Member member = memberRepository.getReferenceById(authId);
-        Team team = teamRepository.save(request.toTeam());
+        Member member = memberModuleService.findMemberById(authId);
+        Team team = teamModuleService.save(request.toTeam(), Team.class);
         if (imageFile != null) {
             amazonS3Provider.uploadImage(amazonConfig.getTeamProfilePath(), team.getId(), imageFile);
         }
         team.updateTeamCode(encodeNumberToChars(team.getId()));
 
         request.teamTagList().stream()
-                .map(tagCommandModuleService::findOrCreateTag)
-                .forEach(tag -> tagTeamRepository.save(
+                .map(tagModuleService::findOrCreateTag)
+                .forEach(tag -> tagModuleService.save(
                         TagTeam.builder()
                                 .tag(tag)
                                 .team(team)
-                                .build()
+                                .build(),
+                        TagTeam.class
                 ));
 
         TeamManage admin = TeamManage.builder()
@@ -81,13 +73,13 @@ public class TeamCommandServiceImpl implements TeamCommandService {
                 .build();
         admin.setTeam(team);
         admin.setMember(member);
-        teamManageRepository.save(admin);
+        teamModuleService.save(admin, TeamManage.class);
         return CreateTeamResult.from(team);
     }
 
     @Override
     public void updateTeam(final Long teamId, final UpdateTeam request, final MultipartFile imageFile) {
-        Team team = teamModuleService.findById(teamId);
+        Team team = teamModuleService.findById(teamId, Team.class);
 
         updateTeamTitle(request.title(), team);
         updateProfileImageIfPresent(imageFile, team);
@@ -113,40 +105,38 @@ public class TeamCommandServiceImpl implements TeamCommandService {
         }
     }
 
-
     @Override
     public void createTeamPassword(final Long teamId, final CreateTeamPassword request) {
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new GeneralException(TEAM_NOT_FOUND));
+        Team team = teamModuleService.findById(teamId, Team.class);
         team.updatePassword(request.password());
     }
 
     @Override
     public void joinTeam(final Member auth, final Long teamId, final ValidatePassword request) {
-        if (!teamModuleService.findById(teamId).getPassword().equals(request.password())) {
+        if (!teamModuleService.findById(teamId, Team.class).getPassword().equals(request.password())) {
             throw new GeneralException(TEAM_PASSWORD_NOT_FOUND);
         }
-        if (teamManageRepository.existsByMemberIdAndTeamId(auth.getId(), teamId)) {
+        if (teamModuleService.existsByMemberIdAndTeamId(auth.getId(), teamId)) {
             throw new GeneralException(TEAM_CONFLICT);
         }
 
-        teamManageRepository.save(TeamManage.builder()
-                .isDeleted(false)
-                .member(auth)
-                .team(teamModuleService.findById(teamId))
-                .build()
+        teamModuleService.save(TeamManage.builder()
+                        .isDeleted(false)
+                        .member(auth)
+                        .team(teamModuleService.findById(teamId, Team.class))
+                        .build(),
+                TeamManage.class
         );
     }
 
     @Override
     public UpdateTeamEndResult updateTeamState(final Long authId, final Long teamId) {
-        Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new GeneralException(TEAM_NOT_FOUND));
+        Team team = teamModuleService.findById(teamId, Team.class);
         team.updateStatus(Status.COMPLETED);
-        List<TeamMemberDto> teamMemberList = teamManageRepository.findAllByTeamId(teamId).stream()
+        List<TeamMemberDto> teamMemberList = teamModuleService.findTeamManageAllByTeamId(teamId).stream()
                 .filter(teamManage -> !teamManage.getMember().getId().equals(authId))
                 .map(teamManage -> {
-                    List<Tag> tagList = teamRoleRepository.findAllByTeamManageId(teamManage.getId()).stream()
+                    List<Tag> tagList = tagModuleService.findAllTeamRoleByTeamManageId(teamManage.getId()).stream()
                             .map(TeamRole::getTag).toList();
                     return TeamMemberDto.of(teamManage, tagList,
                             amazonS3Provider.generateUrl(amazonConfig.getMemberProfilePath(), teamManage.getMember().getId()));
@@ -159,31 +149,29 @@ public class TeamCommandServiceImpl implements TeamCommandService {
     public void createComment(final CreateTeamComment request) {
         request.commentList()
                 .forEach(registerCommentDto -> {
-                    Long memberId = teamManageRepository.findById(registerCommentDto.teamManageId())
-                            .orElseThrow(() -> new GeneralException(TEAM_MANAGE_NOT_FOUND))
+                    Long memberId = teamModuleService.findById(registerCommentDto.teamManageId(), TeamManage.class)
                             .getMember().getId();
                     Comment comment = Comment.builder()
                             .content(registerCommentDto.content())
                             .isHidden(false)
                             .build();
-                    comment.setMember(memberRepository.getReferenceById(memberId));
-                    commentRepository.save(comment);
+                    comment.setMember(memberModuleService.findMemberById(memberId));
+                    memberModuleService.save(comment, Comment.class);
                 });
     }
 
     @Override
     public void exitTeam(final Long authId, final Long teamId) {
-        TeamManage teamManage = teamManageRepository.findByMemberIdAndTeamId(authId, teamId)
-                .orElseThrow(() -> new GeneralException(TEAM_MANAGE_NOT_FOUND));
-        List<TeamRole> teamRoleList = teamRoleRepository.findAllByTeamManageId(teamManage.getId());
+        TeamManage teamManage = teamModuleService.findTeamManageByMemberIdAndTeamId(authId, teamId);
+        List<TeamRole> teamRoleList = tagModuleService.findAllTeamRoleByTeamManageId(teamManage.getId());
         List<Tag> tagList = teamRoleList.stream().map(TeamRole::getTag).toList();
-        teamManageRepository.delete(teamManage);
-        alarmRepository.deleteAllByTeamManageId(teamManage.getId());
-        teamCalendarRepository.deleteAllByTeamManageId(teamManage.getId());
+        teamModuleService.delete(teamManage, TeamManage.class);
+        alarmModuleService.deleteAllByTeamManageId(teamManage.getId());
+        calendarModuleService.deleteAllTeamCalendarByTeamManageId(teamManage.getId());
         scheduleModuleService.deleteScheduleByTeamManageId(teamManage.getId());
         todoModuleService.deleteAllByTeamManageId(teamManage.getId());
-        teamRoleRepository.deleteAll(teamRoleList);
-        tagList.forEach(tag -> tagCommandModuleService.validateAndDeleteTagByTagId(tag.getId()));
+        tagModuleService.deleteAllTeamRole(teamRoleList);
+        tagList.forEach(tag -> tagModuleService.validateAndDeleteTagByTagId(tag.getId()));
     }
 
     private String encodeNumberToChars(final Long teamId) {
