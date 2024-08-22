@@ -64,6 +64,12 @@ public class ScheduleQueryServiceImpl implements ScheduleQueryService {
     }
 
     public TimeTable calculateIntersection(List<Schedule> scheduleList, Function<Schedule, Character[]> function) {
+        if (scheduleList.isEmpty()) {
+            return TimeTable.from(IntStream.range(0, 48)
+                    .mapToObj(i -> '0')
+                    .toArray(Character[]::new));
+        }
+
         return TimeTable.from(IntStream.range(0, 48)
                 .mapToObj(i -> scheduleList.stream()
                         .map(function)
