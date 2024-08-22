@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     List<Alarm> findAllByTeamManageId(Long teamManageId);
+    void deleteAllByTeamManageId(Long teamManageId);
 }

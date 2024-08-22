@@ -1,7 +1,8 @@
 package kr.teammanagers.team.application.command;
 
+import kr.teammanagers.alarm.repository.AlarmRepository;
+import kr.teammanagers.calendar.repository.TeamCalendarRepository;
 import kr.teammanagers.common.Status;
-import kr.teammanagers.common.payload.code.status.ErrorStatus;
 import kr.teammanagers.global.config.AmazonConfig;
 import kr.teammanagers.global.exception.GeneralException;
 import kr.teammanagers.global.provider.AmazonS3Provider;
@@ -9,6 +10,7 @@ import kr.teammanagers.member.domain.Comment;
 import kr.teammanagers.member.domain.Member;
 import kr.teammanagers.member.repository.CommentRepository;
 import kr.teammanagers.member.repository.MemberRepository;
+import kr.teammanagers.schedule.application.module.ScheduleModuleService;
 import kr.teammanagers.tag.application.module.TagCommandModuleService;
 import kr.teammanagers.tag.domain.Tag;
 import kr.teammanagers.tag.domain.TagTeam;
@@ -24,6 +26,7 @@ import kr.teammanagers.team.dto.response.CreateTeamResult;
 import kr.teammanagers.team.dto.response.UpdateTeamEndResult;
 import kr.teammanagers.team.repository.TeamManageRepository;
 import kr.teammanagers.team.repository.TeamRepository;
+import kr.teammanagers.todo.application.module.TodoModuleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +49,11 @@ public class TeamCommandServiceImpl implements TeamCommandService {
     private final TeamManageRepository teamManageRepository;
     private final TeamRoleRepository teamRoleRepository;
     private final CommentRepository commentRepository;
+    private final AlarmRepository alarmRepository;
+    private final TeamCalendarRepository teamCalendarRepository;
 
+    private final TodoModuleService todoModuleService;
+    private final ScheduleModuleService scheduleModuleService;
     private final TagCommandModuleService tagCommandModuleService;
     private final AmazonS3Provider amazonS3Provider;
     private final AmazonConfig amazonConfig;
@@ -171,6 +178,10 @@ public class TeamCommandServiceImpl implements TeamCommandService {
         List<TeamRole> teamRoleList = teamRoleRepository.findAllByTeamManageId(teamManage.getId());
         List<Tag> tagList = teamRoleList.stream().map(TeamRole::getTag).toList();
         teamManageRepository.delete(teamManage);
+        alarmRepository.deleteAllByTeamManageId(teamManage.getId());
+        teamCalendarRepository.deleteAllByTeamManageId(teamManage.getId());
+        scheduleModuleService.deleteScheduleByTeamManageId(teamManage.getId());
+        todoModuleService.deleteAllByTeamManageId(teamManage.getId());
         teamRoleRepository.deleteAll(teamRoleList);
         tagList.forEach(tag -> tagCommandModuleService.validateAndDeleteTagByTagId(tag.getId()));
     }

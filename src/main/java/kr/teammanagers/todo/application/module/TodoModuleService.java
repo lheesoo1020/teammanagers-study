@@ -9,4 +9,6 @@ public interface TodoModuleService {
     List<Todo> getTodoListByTeamManageId(Long teamManageId);
     void saveTodo(Todo todo);
     void deleteTodoById(Long id);
+
+    void deleteAllByTeamManageId(Long teamManageId);
 }

@@ -35,4 +35,9 @@ public class TodoModuleServiceImpl implements TodoModuleService {
     public void deleteTodoById(Long id) {
         todoRepository.deleteById(id);
     }
+
+    @Override
+    public void deleteAllByTeamManageId(final Long teamManageId) {
+        todoRepository.deleteAllByTeamManageId(teamManageId);
+    }
 }
