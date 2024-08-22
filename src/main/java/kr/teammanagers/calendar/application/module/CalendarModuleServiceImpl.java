@@ -24,7 +24,7 @@ public class CalendarModuleServiceImpl implements CalendarModuleService {
     public <T> T save(final T entity, final Class<T> clazz) {
         if (clazz.equals(Calendar.class)) {
             return clazz.cast(calendarRepository.save((Calendar) entity));
-        } else if (clazz.equals(TeamManage.class)) {
+        } else if (clazz.equals(TeamCalendar.class)) {
             return clazz.cast(teamCalendarRepository.save((TeamCalendar) entity));
         } else {
             throw new IllegalArgumentException("Unsupported entity type: " + clazz);
