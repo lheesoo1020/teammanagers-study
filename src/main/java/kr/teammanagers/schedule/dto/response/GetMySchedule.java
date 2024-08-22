@@ -5,11 +5,11 @@ import lombok.Builder;
 
 @Builder
 public record GetMySchedule(
-        ScheduleDto schedule
+        ScheduleDto scheduleDto
 ) {
     public static GetMySchedule from(ScheduleDto scheduleDto) {
         return GetMySchedule.builder()
-                .schedule(scheduleDto)
+                .scheduleDto(scheduleDto)
                 .build();
     }
 }

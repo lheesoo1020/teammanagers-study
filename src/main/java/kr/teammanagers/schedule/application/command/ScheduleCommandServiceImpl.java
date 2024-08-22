@@ -24,6 +24,10 @@ public class ScheduleCommandServiceImpl implements ScheduleCommandService{
     public void create(Long memberId, Long teamId, CreateSchedule request) {
         TeamManage teamManage = teamModuleService.getTeamManageByMemberIdAndTeamId(memberId, teamId);
 
+        if (scheduleModuleService.getScheduleByTeamManageId(teamManage.getId()).isPresent()) {
+            throw new GeneralException((ErrorStatus.SCHEDULE_ALREADY_EXIST));
+        }
+
         Schedule newSchedule = request.toSchedule();
         newSchedule.setTeamManage(teamManage);
 

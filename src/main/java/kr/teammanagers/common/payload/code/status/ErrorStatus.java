@@ -41,6 +41,7 @@ public enum ErrorStatus implements ErrorBaseCode {
 
     // 스케줄 관련 응답
     SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "SCHEDULE404", "존재하지 않는 스케줄입니다."),
+    SCHEDULE_ALREADY_EXIST(HttpStatus.CONFLICT, "SCHEDULE409", "이미 스케줄이 존재합니다."),
 
     // 메모 관련 응답
     MEMO_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMO404", "존재하지 않는 메모입니다."),

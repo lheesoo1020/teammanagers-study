@@ -57,10 +57,21 @@ public class ScheduleQueryServiceImpl implements ScheduleQueryService {
     public GetMySchedule getMySchedule(Long memberId, Long teamId) {
         TeamManage teamManage = teamModuleService.getTeamManageByMemberIdAndTeamId(memberId, teamId);
 
-        Schedule schedule = scheduleModuleService.getScheduleByTeamManageId(teamManage.getId())
-                .orElseThrow(() -> new GeneralException(ErrorStatus.SCHEDULE_NOT_FOUND));
-
-        return GetMySchedule.from(ScheduleDto.from(schedule));
+        return scheduleModuleService.getScheduleByTeamManageId(teamManage.getId())
+                .map(schedule -> GetMySchedule.from(ScheduleDto.from(schedule)))
+                .orElseGet(() -> {
+                    TimeTable emptyTimeTable = TimeTable.from(IntStream.range(0, 48)
+                            .mapToObj(i -> '0')
+                            .toArray(Character[]::new));
+                    return GetMySchedule.from(ScheduleDto.of(
+                            emptyTimeTable,
+                            emptyTimeTable,
+                            emptyTimeTable,
+                            emptyTimeTable,
+                            emptyTimeTable,
+                            emptyTimeTable,
+                            emptyTimeTable));
+                });
     }
 
     public TimeTable calculateIntersection(List<Schedule> scheduleList, Function<Schedule, Character[]> function) {
