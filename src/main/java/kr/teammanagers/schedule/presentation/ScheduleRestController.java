@@ -5,8 +5,10 @@ import kr.teammanagers.common.payload.code.ApiPayload;
 import kr.teammanagers.schedule.application.command.ScheduleCommandService;
 import kr.teammanagers.schedule.application.query.ScheduleQueryService;
 import kr.teammanagers.schedule.dto.request.CreateSchedule;
+import kr.teammanagers.schedule.dto.request.GetPortionSchedule;
 import kr.teammanagers.schedule.dto.request.UpdateSchedule;
 import kr.teammanagers.schedule.dto.response.GetMySchedule;
+import kr.teammanagers.schedule.dto.response.GetPortionScheduleResult;
 import kr.teammanagers.schedule.dto.response.GetTeamSchedule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -57,6 +59,16 @@ public class ScheduleRestController {
 
         return ApiPayload.onSuccess(getTeamSchedule);
     }
+
+    @GetMapping("team/{teamId}/schedule/portion")
+    public ApiPayload<GetPortionScheduleResult> getPortionSchedule(@AuthenticationPrincipal final PrincipalDetails auth,
+                                                                   @RequestBody final GetPortionSchedule request) {
+
+        GetPortionScheduleResult result = scheduleQueryService.getPortionSchedule(request);
+
+        return ApiPayload.onSuccess(result);
+    }
+
 
     @GetMapping("schedule/{teamId}")
     public ApiPayload<GetMySchedule> getMySchedule(@AuthenticationPrincipal final PrincipalDetails auth,

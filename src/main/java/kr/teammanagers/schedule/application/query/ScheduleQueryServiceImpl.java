@@ -4,7 +4,9 @@ import kr.teammanagers.schedule.application.module.ScheduleModuleService;
 import kr.teammanagers.schedule.domain.Schedule;
 import kr.teammanagers.schedule.domain.TimeTable;
 import kr.teammanagers.schedule.dto.ScheduleDto;
+import kr.teammanagers.schedule.dto.request.GetPortionSchedule;
 import kr.teammanagers.schedule.dto.response.GetMySchedule;
+import kr.teammanagers.schedule.dto.response.GetPortionScheduleResult;
 import kr.teammanagers.schedule.dto.response.GetTeamSchedule;
 import kr.teammanagers.team.application.module.TeamModuleService;
 import kr.teammanagers.team.domain.TeamManage;
@@ -53,6 +55,28 @@ public class ScheduleQueryServiceImpl implements ScheduleQueryService {
                         calculateIntersection(teamScheduleList, schedule -> schedule.getSunday().getValue())
                 ),
                 isScheduled
+        );
+    }
+
+    @Override
+    public GetPortionScheduleResult getPortionSchedule(GetPortionSchedule request) {
+
+        List<Schedule> portionScheduleList = request.teamManageList().stream()
+                .map(scheduleModuleService::getScheduleByTeamManageId)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+
+        return GetPortionScheduleResult.of(
+                ScheduleDto.of(
+                        calculateIntersection(portionScheduleList, schedule -> schedule.getMonday().getValue()),
+                        calculateIntersection(portionScheduleList, schedule -> schedule.getTuesday().getValue()),
+                        calculateIntersection(portionScheduleList, schedule -> schedule.getWednesday().getValue()),
+                        calculateIntersection(portionScheduleList, schedule -> schedule.getThursday().getValue()),
+                        calculateIntersection(portionScheduleList, schedule -> schedule.getFriday().getValue()),
+                        calculateIntersection(portionScheduleList, schedule -> schedule.getSaturday().getValue()),
+                        calculateIntersection(portionScheduleList, schedule -> schedule.getSunday().getValue())
+                )
         );
     }
 
