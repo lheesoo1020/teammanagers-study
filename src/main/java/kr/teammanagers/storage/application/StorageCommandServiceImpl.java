@@ -34,7 +34,7 @@ public class StorageCommandServiceImpl implements StorageCommandService {
     private final MemberRepository memberRepository;
 
     @Override
-    public StorageResponse uploadFile(CreateStorageRequest request, User user) {
+    public StorageResponse uploadFile(CreateStorageRequest request, Member member) {
 
         Long teamId = request.getTeamId();
         MultipartFile file = request.getFile();
@@ -44,9 +44,6 @@ public class StorageCommandServiceImpl implements StorageCommandService {
         assert originalFileName != null;
         String fileExtension = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
 
-
-        Member member = memberRepository.findByProviderId(user.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("not found member"));
 
         // 팀 관리 Entity 가져오기
         TeamManage teamManage = teamManageRepository.findByMemberIdAndTeamId(member.getId(), teamId)
@@ -75,12 +72,9 @@ public class StorageCommandServiceImpl implements StorageCommandService {
 
 
     @Override
-    public void deleteFile(Long teamId, Long storageId, User user) {
+    public void deleteFile(Long teamId, Long storageId, Member member) {
         TeamData teamData = teamDataRepository.findById(storageId)
                 .orElseThrow(() -> new IllegalArgumentException("파일이 존재하지 않습니다."));
-
-        Member member = memberRepository.findByProviderId(user.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("유저 정보가 일치하지 않습니다."));
 
         TeamManage teamManage = teamManageRepository.findByMemberIdAndTeamId(member.getId(), teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀에 유저가 속해있지 않습니다."));

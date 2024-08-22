@@ -1,6 +1,7 @@
 package kr.teammanagers.storage.presentation;
 
 import com.amazonaws.services.ec2.model.Storage;
+import kr.teammanagers.auth.dto.PrincipalDetails;
 import kr.teammanagers.storage.application.StorageCommandService;
 import kr.teammanagers.storage.application.StorageQueryService;
 import kr.teammanagers.storage.dto.StorageDto;
@@ -31,7 +32,7 @@ public class StorageController {
     //파일 업로드
     @PostMapping
     public ResponseEntity<StorageResponse> uploadFile(
-            final @AuthenticationPrincipal User user,
+            final @AuthenticationPrincipal PrincipalDetails auth,
             @PathVariable Long teamId,
             @RequestParam("file") MultipartFile file) {
 
@@ -40,14 +41,16 @@ public class StorageController {
         request.setFile(file);
 
 
-        StorageResponse response = storageCommandService.uploadFile(request, user);
+        StorageResponse response = storageCommandService.uploadFile(request, auth.member());
         return ResponseEntity.ok(response);
     }
 
     //팀 파일 목록 가져오기
     @GetMapping
-    public ResponseEntity<List<StorageDto>> getFiles(@PathVariable Long teamId, @AuthenticationPrincipal User user) {
-        List<StorageDto> files = storageQueryService.getFiles(teamId, user);
+    public ResponseEntity<List<StorageDto>> getFiles(
+            @PathVariable Long teamId,
+            @AuthenticationPrincipal PrincipalDetails auth) {
+        List<StorageDto> files = storageQueryService.getFiles(teamId, auth.member());
         log.info(files.toString());
         return ResponseEntity.ok(files);
     }
@@ -58,9 +61,9 @@ public class StorageController {
     public ResponseEntity<InputStreamResource> downloadFile(
             @PathVariable Long teamId,
             @PathVariable Long storageId,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal PrincipalDetails auth) {
 
-        StorageDto storageDto = storageQueryService.downloadFile(teamId, storageId, user);
+        StorageDto storageDto = storageQueryService.downloadFile(teamId, storageId, auth.member());
         InputStreamResource resource = new InputStreamResource(storageDto.inputStream());
 
         return ResponseEntity.ok()
@@ -72,8 +75,11 @@ public class StorageController {
 
     //파일 삭제
     @DeleteMapping("/{storageId}")
-    public String deleteFile(@PathVariable Long teamId, @PathVariable Long storageId, @AuthenticationPrincipal User user) {
-        storageCommandService.deleteFile(teamId, storageId, user);
+    public String deleteFile(
+            @PathVariable Long teamId,
+            @PathVariable Long storageId,
+            @AuthenticationPrincipal PrincipalDetails auth) {
+        storageCommandService.deleteFile(teamId, storageId, auth.member());
         return "파일이 삭제 되었습니다.";
     }
 }

@@ -19,11 +19,9 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,11 +42,8 @@ public class StorageQueryServiceImpl implements StorageQueryService {
 
     //파일 목록 get
     @Override
-    public List<StorageDto> getFiles(Long teamId, User user) {
+    public List<StorageDto> getFiles(Long teamId, Member member) {
         QTeamData qTeamData = QTeamData.teamData;
-
-        Member member = memberRepository.findByProviderId(user.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("유저 정보가 일치하지 않습니다."));
 
         TeamManage teamManage = teamManageRepository.findByMemberIdAndTeamId(member.getId(), teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀에 유저가 속해있지 않습니다."));
@@ -69,43 +64,23 @@ public class StorageQueryServiceImpl implements StorageQueryService {
 
     //파일 다운로드
     @Override
-    public StorageDto downloadFile(Long teamId, Long storageId, User user) {
-
-        log.info("service code in");
+    public StorageDto downloadFile(Long teamId, Long storageId, Member member) {
 
         TeamData teamData = teamDataRepository.findById(storageId)
                 .orElseThrow(() -> new IllegalArgumentException("파일이 존재하지 않습니다."));
 
-        log.info("teamData check in");
-
-        Member member = memberRepository.findByProviderId(user.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("유저 정보가 일치하지 않습니다."));
-
-        log.info("memberRepo check in");
-
         TeamManage teamManage = teamManageRepository.findByMemberIdAndTeamId(member.getId(), teamId)
                 .orElseThrow(() -> new IllegalArgumentException("팀에 유저가 속해있지 않습니다."));
-
-        log.info("TeamManage check in");
 
         if (!teamData.getTeamManage().getTeam().getId().equals(teamId)) {
             throw new IllegalArgumentException("File does not belong to the specified team");
         }
 
-        log.info("User check in");
-
         String fileUrl = teamData.getFileUrl();
-
-        log.info("fireurl check in" + fileUrl);
 
         String key = s3Helper.extractKeyFromUrl(fileUrl);
 
-        log.info("Key check in " + key);
-
         InputStream inputStream = s3Provider.downloadFile(key);
-
-        log.info("inputStream check in");
-
 
         // 전체 파일 이름 (이름 + 확장자)
         String decodedFileName = URLDecoder.decode(teamData.getTitle(), StandardCharsets.UTF_8);
