@@ -15,7 +15,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 public record PrincipalDetails(
         Member member,
         Map<String, Object> attributes,
-        String attributeKey
+        String attributeKey,
+        boolean isNewUser
 ) implements OAuth2User, UserDetails {
 
     @Override
@@ -62,6 +63,11 @@ public record PrincipalDetails(
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public boolean isNewUser() {
+        return isNewUser;
     }
 
 }

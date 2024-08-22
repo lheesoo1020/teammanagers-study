@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Slf4j
@@ -45,14 +46,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         // 5. 회원가입 및 로그인
         Member member = getOrSave(oAuth2UserInfo);
+        boolean isNewUser = isNewUser(member);
 
         // 6. OAuth2User로 반환
-        return new PrincipalDetails(member, oAuth2UserAttributes, userNameAttributeName);
+        return new PrincipalDetails(member, oAuth2UserAttributes, userNameAttributeName, isNewUser);
     }
 
 
     private Member getOrSave(OAuth2UserInfo oAuth2UserInfo) {
         return memberRepository.findByProviderId(oAuth2UserInfo.providerId())
                 .orElseGet(() -> memberRepository.save(oAuth2UserInfo.toEntity()));
+    }
+    private boolean isNewUser(Member member) {
+        // 신규 사용자 여부 판단 로직
+        return member.getCreatedAt() != null && member.getCreatedAt().isAfter(LocalDateTime.now().minusSeconds(3));
     }
 }
