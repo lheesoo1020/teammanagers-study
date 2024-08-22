@@ -37,6 +37,7 @@ public class AlarmScheduler {
                     Alarm newAlarm = Alarm.builder()
                             .type(AlarmType.CALENDAR_REMIND)
                             .date(LocalDateTime.now())
+                            .content(calendar.getDate().toLocalDate().toString())
                             .isRead(false)
                             .referenceId(calendar.getId())
                             .build();

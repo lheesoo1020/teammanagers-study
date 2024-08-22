@@ -2,9 +2,8 @@ package kr.teammanagers.alarm.application.command;
 
 import kr.teammanagers.alarm.application.module.AlarmModuleService;
 import kr.teammanagers.alarm.domain.Alarm;
+import kr.teammanagers.alarm.domain.AlarmType;
 import kr.teammanagers.alarm.dto.request.CreateAlarm;
-import kr.teammanagers.common.payload.code.status.ErrorStatus;
-import kr.teammanagers.global.exception.GeneralException;
 import kr.teammanagers.team.application.module.TeamModuleService;
 import kr.teammanagers.team.domain.TeamManage;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +32,25 @@ public class AlarmCommandServiceImpl implements AlarmCommandService {
 
         alarm.setTeamManage(teamManage);
         alarmModuleService.save(alarm);
+    }
+
+    @Override
+    public void createCustomAlarm(AlarmType alarmType, String content, Long teamManageId, Long referenceId) {
+        TeamManage teamManage = teamModuleService.findById(teamManageId, TeamManage.class);
+
+        if (alarmType == AlarmType.TEAM_FINISH) {
+            Alarm alarm = Alarm.builder()
+                    .type(AlarmType.TEAM_FINISH)
+                    .referenceId(referenceId)
+                    .date(LocalDateTime.now())
+                    .content(content)
+                    .isRead(false)
+                    .build();
+
+            alarm.setTeamManage(teamManage);
+            alarmModuleService.save(alarm);
+        }
+
     }
 
     @Override

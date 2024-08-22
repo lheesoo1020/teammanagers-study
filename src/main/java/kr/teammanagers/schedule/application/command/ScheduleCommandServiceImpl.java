@@ -28,6 +28,10 @@ public class ScheduleCommandServiceImpl implements ScheduleCommandService{
             throw new GeneralException((ErrorStatus.SCHEDULE_ALREADY_EXIST));
         }
 
+        if (scheduleModuleService.getScheduleByTeamManageId(teamManage.getId()).isPresent()) {
+            throw new GeneralException((ErrorStatus.SCHEDULE_ALREADY_EXIST));
+        }
+
         Schedule newSchedule = request.toSchedule();
         newSchedule.setTeamManage(teamManage);
 

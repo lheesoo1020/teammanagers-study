@@ -24,6 +24,9 @@ public class Alarm extends AuditingField {
     @Column
     private Long referenceId;
 
+    @Column
+    private String content;
+
     @Column(nullable = false)
     private LocalDateTime date;
 
@@ -36,9 +39,10 @@ public class Alarm extends AuditingField {
     private TeamManage teamManage;
 
     @Builder
-    private Alarm(final Long referenceId, final AlarmType type, final LocalDateTime date, final Boolean isRead) {
+    private Alarm(final Long referenceId, final AlarmType type, final String content, final LocalDateTime date, final Boolean isRead) {
         this.referenceId = referenceId;
         this.type = type;
+        this.content = content;
         this.isRead = isRead;
         this.date = date;
     }

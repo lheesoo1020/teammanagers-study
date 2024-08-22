@@ -11,6 +11,7 @@ public record AlarmDto(
         Long alarmId,
         AlarmType alarmType,
         Long referenceId,
+        String content,
         LocalDateTime date,
         Boolean isRead
 ) {
@@ -19,6 +20,7 @@ public record AlarmDto(
                 .alarmId(alarm.getId())
                 .alarmType(alarm.getType())
                 .referenceId(alarm.getReferenceId())
+                .content(alarm.getContent())
                 .date(alarm.getDate())
                 .isRead(alarm.getIsRead())
                 .build();

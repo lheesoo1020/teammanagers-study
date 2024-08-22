@@ -1,6 +1,8 @@
 package kr.teammanagers.team.application.command;
 
+import kr.teammanagers.alarm.application.command.AlarmCommandService;
 import kr.teammanagers.alarm.application.module.AlarmModuleService;
+import kr.teammanagers.alarm.domain.AlarmType;
 import kr.teammanagers.calendar.application.module.CalendarModuleService;
 import kr.teammanagers.common.Status;
 import kr.teammanagers.global.config.AmazonConfig;
@@ -45,6 +47,7 @@ public class TeamCommandServiceImpl implements TeamCommandService {
     private final TodoModuleService todoModuleService;
     private final AlarmModuleService alarmModuleService;
     private final CalendarModuleService calendarModuleService;
+    private final AlarmCommandService alarmCommandService;
 
     private final AmazonConfig amazonConfig;
     private final AmazonS3Provider amazonS3Provider;
@@ -132,8 +135,10 @@ public class TeamCommandServiceImpl implements TeamCommandService {
     @Override
     public UpdateTeamEndResult updateTeamState(final Long authId, final Long teamId) {
         Team team = teamModuleService.findById(teamId, Team.class);
+        TeamManage myTeamManage = teamModuleService.findTeamManageByMemberIdAndTeamId(authId, teamId);
+        List<TeamManage> teamManageList = teamModuleService.findTeamManageAllByTeamId(teamId);
         team.updateStatus(Status.COMPLETED);
-        List<TeamMemberDto> teamMemberList = teamModuleService.findTeamManageAllByTeamId(teamId).stream()
+        List<TeamMemberDto> teamMemberList = teamManageList.stream()
                 .filter(teamManage -> !teamManage.getMember().getId().equals(authId))
                 .map(teamManage -> {
                     List<Tag> tagList = tagModuleService.findAllTeamRoleByTeamManageId(teamManage.getId()).stream()
@@ -141,6 +146,8 @@ public class TeamCommandServiceImpl implements TeamCommandService {
                     return TeamMemberDto.of(teamManage, tagList,
                             amazonS3Provider.generateUrl(amazonConfig.getMemberProfilePath(), teamManage.getMember().getId()));
                 }).toList();
+
+        alarmCommandService.createCustomAlarm(AlarmType.TEAM_FINISH, team.getTitle(), myTeamManage.getId(), teamId);
 
         return UpdateTeamEndResult.from(teamMemberList);
     }
