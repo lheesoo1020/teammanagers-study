@@ -1,7 +1,5 @@
 package kr.teammanagers.schedule.application.query;
 
-import kr.teammanagers.common.payload.code.status.ErrorStatus;
-import kr.teammanagers.global.exception.GeneralException;
 import kr.teammanagers.schedule.application.module.ScheduleModuleService;
 import kr.teammanagers.schedule.domain.Schedule;
 import kr.teammanagers.schedule.domain.TimeTable;
@@ -28,7 +26,9 @@ public class ScheduleQueryServiceImpl implements ScheduleQueryService {
     private final TeamModuleService teamModuleService;
 
     @Override
-    public GetTeamSchedule getTeamSchedule(Long teamId) {
+    public GetTeamSchedule getTeamSchedule(Long memberId, Long teamId) {
+
+        TeamManage myTeamManage = teamModuleService.findTeamManageByMemberIdAndTeamId(memberId, teamId);
 
         List<Schedule> teamScheduleList = teamModuleService.findTeamManageAllByTeamId(teamId).stream()
                 .map(teamManage -> scheduleModuleService.getScheduleByTeamManageId(teamManage.getId()))
@@ -40,6 +40,8 @@ public class ScheduleQueryServiceImpl implements ScheduleQueryService {
                 .map(schedule -> schedule.getTeamManage().getId())
                 .toList();
 
+        Boolean isScheduled = scheduledTeamManageIdList.contains(myTeamManage.getId());
+
         return GetTeamSchedule.of(scheduledTeamManageIdList,
                 ScheduleDto.of(
                         calculateIntersection(teamScheduleList, schedule -> schedule.getMonday().getValue()),
@@ -49,7 +51,8 @@ public class ScheduleQueryServiceImpl implements ScheduleQueryService {
                         calculateIntersection(teamScheduleList, schedule -> schedule.getFriday().getValue()),
                         calculateIntersection(teamScheduleList, schedule -> schedule.getSaturday().getValue()),
                         calculateIntersection(teamScheduleList, schedule -> schedule.getSunday().getValue())
-                )
+                ),
+                isScheduled
         );
     }
 

@@ -53,7 +53,7 @@ public class ScheduleRestController {
     public ApiPayload<GetTeamSchedule> getTeamSchedule(@AuthenticationPrincipal final PrincipalDetails auth,
                                                        @PathVariable(name = "teamId") final Long teamId) {
 
-        GetTeamSchedule getTeamSchedule = scheduleQueryService.getTeamSchedule(teamId);
+        GetTeamSchedule getTeamSchedule = scheduleQueryService.getTeamSchedule(auth.member().getId(), teamId);
 
         return ApiPayload.onSuccess(getTeamSchedule);
     }
