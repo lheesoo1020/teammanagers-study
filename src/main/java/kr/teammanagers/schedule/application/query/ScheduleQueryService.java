@@ -7,6 +7,8 @@ import kr.teammanagers.schedule.dto.response.GetTeamSchedule;
 
 public interface ScheduleQueryService {
     GetTeamSchedule getTeamSchedule(Long memberId, Long teamId);
+
     GetPortionScheduleResult getPortionSchedule(GetPortionSchedule request);
+
     GetMySchedule getMySchedule(Long memberId, Long teamId);
 }

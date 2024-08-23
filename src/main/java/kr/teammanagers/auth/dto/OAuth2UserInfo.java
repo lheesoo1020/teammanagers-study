@@ -6,7 +6,8 @@ import lombok.Builder;
 
 import java.util.Map;
 
-import static kr.teammanagers.global.exception.ErrorCode.ILLEGAL_REGISTRATION_ID;
+import static kr.teammanagers.common.payload.code.status.ErrorStatus.AUTH_ILLEGAL_REGISTRATION_ID;
+
 
 @Builder
 public record OAuth2UserInfo(
@@ -17,16 +18,16 @@ public record OAuth2UserInfo(
         String birth,
         String phoneNumber
 ) {
-    public static OAuth2UserInfo of(String registrationId, Map<String, Object> attributes) throws AuthException {
+    public static OAuth2UserInfo of(final String registrationId, final Map<String, Object> attributes) throws AuthException {
         return switch (registrationId) { // registration id별로 userInfo 생성
             case "google" -> ofGoogle(attributes);
             case "kakao" -> ofKakao(attributes);
             case "naver" -> ofNaver(attributes);
-            default -> throw new AuthException(ILLEGAL_REGISTRATION_ID.getMessage());
+            default -> throw new AuthException(AUTH_ILLEGAL_REGISTRATION_ID.getMessage());
         };
     }
 
-    private static OAuth2UserInfo ofGoogle(Map<String, Object> attributes) {
+    private static OAuth2UserInfo ofGoogle(final Map<String, Object> attributes) {
         return OAuth2UserInfo.builder()
                 .providerId((String) attributes.get("sub"))
                 .name(((String) attributes.get("email")).split("@")[0])
@@ -34,7 +35,7 @@ public record OAuth2UserInfo(
                 .build();
     }
 
-    private static OAuth2UserInfo ofKakao(Map<String, Object> attributes) {
+    private static OAuth2UserInfo ofKakao(final Map<String, Object> attributes) {
         Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> profile = (Map<String, Object>) account.get("profile");
 
@@ -45,7 +46,7 @@ public record OAuth2UserInfo(
                 .build();
     }
 
-    private static OAuth2UserInfo ofNaver(Map<String, Object> attributes) {
+    private static OAuth2UserInfo ofNaver(final Map<String, Object> attributes) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
         return OAuth2UserInfo.builder()

@@ -14,7 +14,7 @@ public class CustomUserDetails extends User implements OAuth2User {
     private final Member member;
     private final Map<String, Object> attributes;
 
-    public CustomUserDetails(Member member, Collection<? extends GrantedAuthority> authorities) {
+    public CustomUserDetails(final Member member, final Collection<? extends GrantedAuthority> authorities) {
         super(member.getEmail(), "", authorities); // password는 빈 문자열로 설정
         this.member = member;
         this.attributes = Collections.emptyMap();

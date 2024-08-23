@@ -9,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
-import static kr.teammanagers.common.payload.code.status.ErrorStatus.*;
+import static kr.teammanagers.common.payload.code.status.ErrorStatus.MEMBER_COMMENT_NOT_FOUND;
+import static kr.teammanagers.common.payload.code.status.ErrorStatus.MEMBER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,11 @@ public class MemberModuleServiceImpl implements MemberModuleService {
         } else {
             throw new IllegalArgumentException("Unsupported entity type: " + clazz);
         }
+    }
+
+    @Override
+    public Optional<Member> findMemberByProviderId(final String providerId) {
+        return memberRepository.findByProviderId(providerId);
     }
 
     @Override

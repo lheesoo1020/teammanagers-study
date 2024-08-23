@@ -1,4 +1,4 @@
-package kr.teammanagers.global.provider;
+package kr.teammanagers.auth.provider;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -6,12 +6,11 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import kr.teammanagers.auth.Application.TokenService;
 import kr.teammanagers.auth.dto.PrincipalDetails;
-import kr.teammanagers.auth.jwt.domain.MemberToken;
-import kr.teammanagers.global.exception.TokenException;
+import kr.teammanagers.common.payload.code.status.ErrorStatus;
+import kr.teammanagers.global.exception.GeneralException;
+import kr.teammanagers.member.application.module.MemberModuleService;
 import kr.teammanagers.member.domain.Member;
-import kr.teammanagers.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,11 +27,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kr.teammanagers.global.exception.ErrorCode.INVALID_JWT_SIGNATURE;
-import static kr.teammanagers.global.exception.ErrorCode.INVALID_TOKEN;
-
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class TokenProvider {
 
     @Value("${TOKEN_SECRET}")
@@ -46,8 +42,7 @@ public class TokenProvider {
     private long refreshTokenExpireTime;
 
     private static final String KEY_ROLE = "role";
-    private final TokenService tokenService;
-    private final MemberRepository memberRepository;
+    private final MemberModuleService memberModuleService;
 
     @PostConstruct
     public void init() {
@@ -58,10 +53,8 @@ public class TokenProvider {
         return generateToken(authentication, accessTokenExpireTime);
     }
 
-    public void generateRefreshToken(Authentication authentication, String accessToken) {
-        String refreshToken = generateToken(authentication, refreshTokenExpireTime);
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        tokenService.saveOrUpdate(getUsername(authentication), refreshToken, accessToken);
+    public String generateRefreshToken(Authentication authentication) {
+        return generateToken(authentication, refreshTokenExpireTime);
     }
 
     private String generateToken(Authentication authentication, long expireTime) {
@@ -86,8 +79,8 @@ public class TokenProvider {
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);
         List<SimpleGrantedAuthority> authorities = getAuthorities(claims);
-        Member member = memberRepository.findByProviderId(claims.getSubject())
-                .orElseThrow(RuntimeException::new);
+        Member member = memberModuleService.findMemberByProviderId(claims.getSubject())
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
         PrincipalDetails principal = PrincipalDetails.builder()
                 .member(member)
                 .build();
@@ -99,16 +92,10 @@ public class TokenProvider {
                 claims.get(KEY_ROLE).toString()));
     }
 
-    public String reissueAccessToken(String accessToken) {
-        if (StringUtils.hasText(accessToken)) {
-            MemberToken token = tokenService.getTokenByAccessToken(accessToken)
-                    .orElseThrow(() -> new TokenException(INVALID_TOKEN));
-            String refreshToken = token.getRefreshToken();
-
+    public String reissueAccessToken(String refreshToken) {
+        if (StringUtils.hasText(refreshToken)) {
             if (validateToken(refreshToken)) {
-                String reissuedAccessToken = generateAccessToken(getAuthentication(refreshToken));
-                tokenService.saveOrUpdate(token.getMember().getProviderId(), refreshToken, reissuedAccessToken);
-                return reissuedAccessToken;
+                return generateAccessToken(getAuthentication(refreshToken));
             }
         }
         return null;
@@ -118,7 +105,6 @@ public class TokenProvider {
         if (!StringUtils.hasText(token)) {
             return false;
         }
-
         Claims claims = parseClaims(token);
         return claims.getExpiration().after(new Date());
     }
@@ -130,9 +116,9 @@ public class TokenProvider {
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         } catch (MalformedJwtException e) {
-            throw new TokenException(INVALID_TOKEN);
+            throw new GeneralException(ErrorStatus.AUTH_INVALID_TOKEN);
         } catch (SecurityException e) {
-            throw new TokenException(INVALID_JWT_SIGNATURE);
+            throw new GeneralException(ErrorStatus.AUTH_INVALID_JWT_SIGNATURE);
         }
     }
 

@@ -25,7 +25,6 @@ import java.util.Optional;
 @RestControllerAdvice(annotations = {RestController.class})
 public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
-
     @ExceptionHandler
     public ResponseEntity<Object> validation(final ConstraintViolationException e, final WebRequest request) {
         String errorMessage = e.getConstraintViolations().stream()

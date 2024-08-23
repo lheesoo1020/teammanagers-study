@@ -1,23 +1,23 @@
-package kr.teammanagers.global.exception;
+package kr.teammanagers.auth.filter;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-
-import kr.teammanagers.global.constant.TokenKey;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
-import kr.teammanagers.global.provider.TokenProvider;
+import kr.teammanagers.global.constant.TokenKey;
+import kr.teammanagers.auth.provider.TokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.beans.factory.annotation.Value;
+
+import java.io.IOException;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RequiredArgsConstructor
 @Component
@@ -35,12 +35,12 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String accessToken = resolveToken(request, accessTokenHeader);
+        String refreshToken = resolveToken(request, refreshTokenHeader);
 
         if (tokenProvider.validateToken(accessToken)) {
             setAuthentication(accessToken);
         } else {
-            String reissueAccessToken = tokenProvider.reissueAccessToken(accessToken);
-
+            String reissueAccessToken = tokenProvider.reissueAccessToken(refreshToken);
             if (StringUtils.hasText(reissueAccessToken)) {
                 setAuthentication(reissueAccessToken);
                 response.setHeader(AUTHORIZATION, TokenKey.TOKEN_PREFIX + reissueAccessToken);

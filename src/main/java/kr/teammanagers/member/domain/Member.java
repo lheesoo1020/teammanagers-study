@@ -38,6 +38,9 @@ public class Member extends AuditingField {
     @Column(unique = true, nullable = false, length = 64)
     private String providerId;
 
+    @Column(name = "refresh_token", length = 500)
+    private String refreshToken;
+
     @Builder
     private Member(final String name, final String birth, final String email, final String phoneNumber, final String belong, final String providerId) {
         this.name = name;
@@ -58,6 +61,10 @@ public class Member extends AuditingField {
 
     public void updateBelong(final String belong) {
         this.belong = belong;
+    }
+
+    public void updateRefreshToken(final String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public SocialType judgeLoginProcess() {

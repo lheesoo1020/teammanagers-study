@@ -1,8 +1,9 @@
 package kr.teammanagers.global.exception;
 
-public class AuthException extends CustomException {
+import kr.teammanagers.common.payload.code.status.ErrorStatus;
 
-    public AuthException(ErrorCode errorCode) {
-        super(errorCode);
+public class AuthException extends GeneralException {
+    public AuthException(ErrorStatus errorStatus) {
+        super(errorStatus);
     }
 }

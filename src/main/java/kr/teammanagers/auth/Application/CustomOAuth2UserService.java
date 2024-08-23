@@ -1,11 +1,12 @@
 package kr.teammanagers.auth.Application;
+
 import kr.teammanagers.auth.dto.OAuth2UserInfo;
 import kr.teammanagers.auth.dto.PrincipalDetails;
 import kr.teammanagers.global.exception.AuthException;
+import kr.teammanagers.global.exception.GeneralException;
+import kr.teammanagers.member.application.module.MemberModuleService;
 import kr.teammanagers.member.domain.Member;
-import kr.teammanagers.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -16,16 +17,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@Slf4j
-@RequiredArgsConstructor
+import static kr.teammanagers.auth.constant.AuthConstant.SEC_BY_JUDGE_NEW_MEMBER;
+import static kr.teammanagers.common.payload.code.status.ErrorStatus.AUTH_FORBIDDEN;
+
 @Service
+@RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final MemberRepository memberRepository;
+    private final MemberModuleService memberModuleService;
 
     @Transactional
     @Override
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException, AuthException {
+    public OAuth2User loadUser(final OAuth2UserRequest userRequest) throws OAuth2AuthenticationException, AuthException {
         // 1. 유저 정보(attributes) 가져오기
         Map<String, Object> oAuth2UserAttributes = super.loadUser(userRequest).getAttributes();
 
@@ -41,7 +44,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         try {
             oAuth2UserInfo = OAuth2UserInfo.of(registrationId, oAuth2UserAttributes);
         } catch (jakarta.security.auth.message.AuthException e) {
-            throw new RuntimeException(e);
+            throw new GeneralException(AUTH_FORBIDDEN);
         }
 
         // 5. 회원가입 및 로그인
@@ -52,13 +55,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return new PrincipalDetails(member, oAuth2UserAttributes, userNameAttributeName, isNewUser);
     }
 
-
-    private Member getOrSave(OAuth2UserInfo oAuth2UserInfo) {
-        return memberRepository.findByProviderId(oAuth2UserInfo.providerId())
-                .orElseGet(() -> memberRepository.save(oAuth2UserInfo.toEntity()));
+    private Member getOrSave(final OAuth2UserInfo oAuth2UserInfo) {
+        return memberModuleService.findMemberByProviderId(oAuth2UserInfo.providerId())
+                .orElseGet(() -> memberModuleService.save(oAuth2UserInfo.toEntity(), Member.class));
     }
-    private boolean isNewUser(Member member) {
+
+    private boolean isNewUser(final Member member) {
         // 신규 사용자 여부 판단 로직
-        return member.getCreatedAt() != null && member.getCreatedAt().isAfter(LocalDateTime.now().minusSeconds(3));
+        return member.getCreatedAt() != null && member.getCreatedAt().isAfter(LocalDateTime.now().minusSeconds(SEC_BY_JUDGE_NEW_MEMBER));
     }
 }
